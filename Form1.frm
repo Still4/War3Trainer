@@ -4,70 +4,62 @@ Begin VB.Form Form1
    AutoRedraw      =   -1  'True
    BorderStyle     =   1  'Fixed Single
    Caption         =   "[tc]魔兽3内存修改器"
-   ClientHeight    =   5010
+   ClientHeight    =   6150
    ClientLeft      =   150
    ClientTop       =   435
-   ClientWidth     =   8190
+   ClientWidth     =   5670
    Icon            =   "Form1.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
-   ScaleHeight     =   5010
-   ScaleWidth      =   8190
+   ScaleHeight     =   6150
+   ScaleWidth      =   5670
    StartUpPosition =   2  '屏幕中心
    Begin VB.CommandButton cmdAntiRefresh 
       Caption         =   "终止刷新"
       Enabled         =   0   'False
       Height          =   375
-      Left            =   5160
-      TabIndex        =   9
-      Top             =   120
+      Left            =   2640
+      TabIndex        =   8
+      Top             =   1200
       Width           =   1215
    End
    Begin VB.CommandButton cmdReFresh 
       Caption         =   "刷新"
       Height          =   375
-      Left            =   3840
-      TabIndex        =   8
-      Top             =   120
+      Left            =   1320
+      TabIndex        =   7
+      Top             =   1200
       Width           =   1215
    End
    Begin VB.CommandButton cmdEdit 
       Caption         =   "修改"
       Enabled         =   0   'False
       Height          =   375
-      Left            =   6480
-      TabIndex        =   7
-      Top             =   120
-      Width           =   1215
-   End
-   Begin VB.Frame Frame3 
-      Caption         =   "游戏"
-      Height          =   2655
-      Left            =   240
+      Left            =   3960
       TabIndex        =   6
-      Top             =   2160
-      Width           =   2295
+      Top             =   1200
+      Width           =   1215
    End
    Begin VB.Timer Timer1 
       Enabled         =   0   'False
       Interval        =   500
-      Left            =   7680
-      Top             =   120
+      Left            =   5160
+      Top             =   1200
    End
    Begin VB.TextBox txtVal1 
       Height          =   270
-      Left            =   5760
+      Left            =   3240
       TabIndex        =   4
-      Top             =   1680
+      Top             =   2760
       Visible         =   0   'False
       Width           =   1500
    End
    Begin VB.Frame Frame2 
       Caption         =   "单位"
       Height          =   4575
-      Left            =   2760
+      Left            =   240
       TabIndex        =   3
-      Top             =   240
+      Top             =   1320
       Width           =   5175
       Begin MSHierarchicalFlexGridLib.MSHFlexGrid gridHero 
          Height          =   3975

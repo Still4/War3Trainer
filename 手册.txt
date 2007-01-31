@@ -54,7 +54,24 @@ jmp 6F13CE80	e9 97 30 cf 6e
 nop	90
 
 
-4、智力（未完成）
+4、智力	[[00461014]+78]
+（1）原来的代码
+6F088E78:
+mov eax,[edx+78]	8b 42 78
+pop esi			5e
+pop ebx			5b
+（2）修改后
+6F088E78:
+jmp 00449E20	e9 a3 0f 3c 91
+00449E20:
+cmp [00461014],edx	39 15 14 10 46 00
+ja 00449E2E		77 06			<if edx small goto L1>
+mov [00461014],edx	89 15 14 10 46 00	<if edx bigger->save>
+<L1:>
+mov eax,[edx+78]	8b 42 78
+pop esi			5e
+pop ebx			5b
+jmp 6F088E7D		e9 45 f0 c3 6e
 
 
 5、移动速度	[[0046100C]+78]

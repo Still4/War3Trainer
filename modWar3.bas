@@ -1,5 +1,6 @@
 Attribute VB_Name = "modWar3"
 Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
+Private Declare Function GetTickCount Lib "kernel32" () As Long
 
 Public BroodHwnd As Long
 
@@ -26,6 +27,11 @@ Public sMemory(1 To 6) As t_MemInfo
 Public sMemoryState(1 To 6) As t_MemManage
 Public Const sMemoryMin As Long = 1
 Public Const sMemoryMax As Long = 6
+
+' Patch 2007.1.31 - 处理智力的特殊代码
+' Begin
+Public tickStart1 As Long
+' End
 
 Public Sub dataInit(dataGrid As MSHFlexGrid)
     Dim i As Integer, j As Integer
@@ -63,11 +69,12 @@ End Sub
 Public Sub goInject()
     Dim i As Integer
     Dim var1(0 To 3) As Byte
-    var1(0) = 255
-    var1(1) = 255
-    var1(2) = 255
-    var1(3) = 255
     For i = sMemoryMin To sMemoryMax
+        var1(0) = 0
+        var1(1) = 0
+        var1(2) = 0
+        var1(3) = 0
+        
         EditMem BroodHwnd, sMemory(i).Address2, sMemory(i).Mem2
         EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem1
         EditMem BroodHwnd, sMemory(i).Address3, var1
@@ -90,10 +97,10 @@ Public Sub findHero(dataGrid As MSHFlexGrid)
             With sMemory(i)
                 ReadMem BroodHwnd, .Address3, vMem
                 CopyMemory ByVal VarPtr(vVal), vMem(0), 4
-                If vMem(0) = 255 _
-                And vMem(1) = 255 _
-                And vMem(2) = 255 _
-                And vMem(3) = 255 Then
+                If vMem(0) = 0 _
+                And vMem(1) = 0 _
+                And vMem(2) = 0 _
+                And vMem(3) = 0 Then
                     ' 还没有搞定
                 Else
                     ' 读取
@@ -106,9 +113,30 @@ Public Sub findHero(dataGrid As MSHFlexGrid)
                         dataGrid.TextMatrix(.Index, 1) = Trim(Str(vRetFloat))
                     End If
                     ' 记录、恢复正常代码
-                    sMemoryState(i).ok = True
-                    sMemoryState(i).Address1 = vVal
-                    EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem0
+                    'sMemoryState(i).ok = True
+                    'sMemoryState(i).Address1 = vVal
+                    'EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem0
+                    
+                    ' Patch 2007.1.31 - 处理智力的特殊代码 ----------------
+                    ' Begin
+                    If i = 3 Then
+                        ' “敏捷”刚刚找到
+                        tickStart1 = GetTickCount
+                    End If
+                    If i = 4 Then  ' 当前是"智力"
+                        If sMemoryState(3).ok And GetTickCount - tickStart1 > 3000 Then  ' “敏捷”已经找到&&已经超时3秒
+                            ' 记录、恢复正常代码
+                            sMemoryState(i).ok = True
+                            sMemoryState(i).Address1 = vVal
+                            EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem0
+                        End If
+                    Else           ' 普通情况
+                        ' 记录、恢复正常代码
+                        sMemoryState(i).ok = True
+                        sMemoryState(i).Address1 = vVal
+                        EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem0
+                    End If
+                    ' Patch End -------------------------------------------
                 End If
             End With
         End If
