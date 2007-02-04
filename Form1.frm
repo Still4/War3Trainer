@@ -201,9 +201,7 @@ Private Sub Timer1_Timer()
         End If
     Next
     If ok Then
-        Timer1.Enabled = False
-        cmdAntiRefresh.Enabled = False
-        cmdEdit.Enabled = True
+        Call cmdAntiRefresh_Click
     End If
 End Sub
 
@@ -221,7 +219,7 @@ End Sub
 Private Sub cmdAntiRefresh_Click()
     Call AntiRefresh
     Timer1.Enabled = False
-    cmdEdit.Enabled = False
+    cmdEdit.Enabled = True
     cmdAntiRefresh.Enabled = False
 End Sub
 
