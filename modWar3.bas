@@ -23,10 +23,10 @@ Public Type t_MemManage
     ok As Boolean
 End Type
 
-Public sMemory(1 To 6) As t_MemInfo
-Public sMemoryState(1 To 6) As t_MemManage
+Public sMemory(1 To 12) As t_MemInfo
+Public sMemoryState(1 To 12) As t_MemManage
 Public Const sMemoryMin As Long = 1
-Public Const sMemoryMax As Long = 6
+Public Const sMemoryMax As Long = 12
 
 ' Patch 2007.1.31 - 处理智力的特殊代码
 ' Begin
@@ -34,6 +34,8 @@ Public tickStart1 As Long
 ' End
 
 Public Sub dataInit(dataGrid As MSHFlexGrid)
+    On Error Resume Next
+
     Dim i As Integer, j As Integer
     For i = sMemoryMin To sMemoryMax
         j = j + 1
@@ -51,19 +53,6 @@ Public Sub dataInit(dataGrid As MSHFlexGrid)
             .Index = j
         End With
     Next
-    ' 经验值
-    ' 力量
-    ' 敏捷
-    ' 智力
-    
-    ' 移动速度
-    ' 攻击速度
-    
-    ' 攻击加成
-    ' 基础攻击
-    ' 攻击倍乘
-    ' 攻击类型
-    ' 护甲类型
 End Sub
 
 Public Sub goInject()
@@ -75,9 +64,11 @@ Public Sub goInject()
         var1(2) = 0
         var1(3) = 0
         
-        EditMem BroodHwnd, sMemory(i).Address2, sMemory(i).Mem2
-        EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem1
-        EditMem BroodHwnd, sMemory(i).Address3, var1
+        If sMemory(i).Address1 <> 0 Then
+            EditMem BroodHwnd, sMemory(i).Address2, sMemory(i).Mem2
+            EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem1
+            EditMem BroodHwnd, sMemory(i).Address3, var1
+        End If
         sMemoryState(i).ok = False
         sMemoryState(i).Address1 = 0
     Next
@@ -134,7 +125,9 @@ Public Sub findHero(dataGrid As MSHFlexGrid)
                         ' 记录、恢复正常代码
                         sMemoryState(i).ok = True
                         sMemoryState(i).Address1 = vVal
-                        EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem0
+                        If sMemory(i).Address1 <> 0 Then
+                            EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem0
+                        End If
                     End If
                     ' Patch End -------------------------------------------
                 End If
@@ -159,6 +152,7 @@ Public Sub editHero(dataGrid As MSHFlexGrid)
         vStr = dataGrid.TextMatrix(.Index, 2)
         If Trim(vStr) <> "" And vVal <> 0 Then
         ' 改!
+            dataGrid.TextMatrix(.Index, 1) = dataGrid.TextMatrix(.Index, 2)
             dataGrid.TextMatrix(.Index, 2) = ""
             If .DataType = vbLong Then
                 vRetLng = Val(vStr)
@@ -182,6 +176,8 @@ Sub AntiRefresh()
     For i = sMemoryMin To sMemoryMax
         sMemoryState(i).ok = True
         ' 恢复正常代码
-        EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem0
+        If sMemory(i).Address1 <> 0 Then
+            EditMem BroodHwnd, sMemory(i).Address1, sMemory(i).Mem0
+        End If
     Next
 End Sub

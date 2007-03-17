@@ -5,6 +5,7 @@ Module=OperMem; OperMem.bas
 Module=OperProc; OperProc.bas
 Module=modWar3; modWar3.bas
 Object={0ECD9B60-23AA-11D0-B351-00A0C9055D8E}#6.0#0; MSHFLXGD.OCX
+Module=modWar3Money; modWar3Money.bas
 ResFile32="War3Trainer.RES"
 IconForm="Form1"
 Startup="Form1"
