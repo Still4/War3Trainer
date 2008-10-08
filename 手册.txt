@@ -1,159 +1,153 @@
-[tc]魔兽3 1.21内存修改器
-程序员手册
-[tc]天驰
-2007.3.17
+[tc]魔兽3 1.22.0.6328内存修改器 程序员手册
+          [tc]天驰  2008.10.7
 
-一、内存空洞
-1、Read+Write
-00461000
-2、Read（execute代用）
-0044A800
+一、单位ESI的获得
+1、内存空洞：Read / Write：003D0000
+2、原来的部分：
+6F353D25:
+8b b4 24 ec 08 00 00	mov esi,[esp+000008ec]
 
-二、修改器内存分配（全部使用魔兽资源）
-1、经验值	[[00461000]+8c]		int
-（1）原来的代码
-6F1B2EDB:
-mov eax,[eax+0000008c]	8b 80 8c 00 00 00
-（2）修改后
-6F1B2EDB:
-jmp 0044A800	e9 20 79 29 91
-nop	90
-0044A800:
-mov [00461000],eax	89 05 00 10 46 00
-mov eax,[eax+0000008c]	8b 80 8c 00 00 00
-jmp 6F1B2EE1	e9 d0 86 d6 6e
-nop	90
+6F353D25:
+e9 d6 c3 07 91	jmp 003D0100
+90		nop
+90		nop
 
-2、力量	[[00461004]+94]		int
-（1）原来的代码
-6F13CDFE:
-mov edi,[esi+00000094]	8b be 94 00 00 00
-（2）修改后
-6F13CDFE:
-jmp 0044A820	e9 1d da 30 91
-nop	90
-0044A820:
-mov [00461004],esi	89 35 04 10 46 00
-mov edi,[esi+00000094]	8b be 94 00 00 00
-jmp 6F13CE04	e9 d3 25 cf 6e
-nop	90
+003D0100:
+8b b4 24 ec 08 00 00	mov esi,[esp+000008ec]
+89 35 00 00 3d 00	mov [003D0000], esi
+e9 1a 3c f8 6e		jmp 6F353D2C
 
+3、在6F353D25搞到的ESI，解开，
+● ESI记为ThisUnit
+● [ThisUnit + 1E4]记为UnitAttributes
+● [ThisUnit + 1EC]记为HeroAttributes
+例：[08220320 + 1E4] = 07B60424
+    [08220320 + 1EC] = 05AA0094
 
-3、敏捷	[[00461008]+a8]		int
-（1）原来的代码
-6F13CEEB:
-mov edi,[esi+000000a8]	8b be a8 00 00 00
-（2）修改后
-6F13CEEB:
-jmp 0044A840	e9 50 d9 30 91
-nop	90
-0044A840:
-mov [00461008],esi	89 35 08 10 46 00
-mov edi,[esi+000000a8]	8b be a8 00 00 00
-jmp 6F13CEF1	e9 A0 26 CF 6E
-nop	90
+4、重要的内存提取算法
+算法0（6F03F180）：从GameMemory取得数据，需要索引号Index1和一个参考数ReferenceNumber1。注意Index1最高位不得为1，不然不是这个算法。建议判一下正负。
+（1）[6FAA4178]记为ThisGame
+例：[6FAA4178] = 02AE00B8
+（2）[ThisGame + 0xC]计为ThisGameMemory
+例：[02AE00B8 + C] = 0F060088
+（3）[ThisGameMemory + Index1 * 8 + 4]计为Address1，返回之
+（4）[Address1 + 0x18]应当等于ReferenceNumber1，不相等游戏会异常（访问地址0），所以做修改器不用考虑这里
 
+算法1（6F4634E0）：也需要Index1
+（1）用算法0
+（2）Address1 + 0x78输出为地址
 
-4、智力	[[00461014]+78]		int
-（1）原来的代码
-6F088E78:
-mov eax,[edx+78]	8b 42 78
-pop esi			5e
-pop ebx			5b
-（2）修改后
-6F088E78:
-jmp 00449E20	e9 a3 0f 3c 91
-00449E20:
-cmp [00461014],edx	39 15 14 10 46 00
-ja 00449E2E		77 06			<if edx small goto L1>
-mov [00461014],edx	89 15 14 10 46 00	<if edx bigger->save>
-<L1:>
-mov eax,[edx+78]	8b 42 78
-pop esi			5e
-pop ebx			5b
-jmp 6F088E7D		e9 45 f0 c3 6e
+算法2（6F468A20）：也需要Index1
+（1）[ThisGameMemory + Index1 * 8 + 4]，记为Address3
+（2）[Address3 + 20]为零的前提下返回[Address + 54]的内容
 
+二、单位的修改
+1、HP float
+[HPMax地址-C]
 
-5、移动速度	[[0046100C]+78]		float
-（1）原来的代码
-6F55FA2F:
-mov ecx,[esi+78]	8b 4e 78
-mov edx,[ebp-1c]	8b 55 e4
-（2）修改后
-6F55FA2F:
-jmp 0044A860	e9 2C AE EE 90
-nop	90
-0044A860:
-mov [0046100C],esi	89 35 0c 10 46 00
-mov ecx,[esi+78]	8b 4e 78
-mov edx,[ebp-1c]	8b 55 e4
-jmp 6F55FA35	e9 C4 51 11 6F
-nop	90
+2、HPMax float
+（1）ThisUnit + 98		// 参考sub_6F28A760
+例：08220320 + 98
+（2）[上面 + 8]			// 参考sub_6F467710
+例：[82203C0] = 06BC
+（3）用算法0解开上面
+例：093E0AFC
+（4）解开后内容在[上面 + 84]	// 参考6F46752F: fcompp, EDX
 
+3、MP float
+[MPMax地址-C]
 
-6、攻击频率	[[00461010]+1b0]		float
-（1）原来的代码
-6F55790D:
-mov eax,[esi+000001b0]	8b 86 b0 01 00 00
-（2）修改后
-6F55790D:
-jmp 0044A880	e9 6E 2F EF 90
-nop	90
-0044A880:
-mov [00461010],esi	89 35 10 10 46 00
-mov eax,[esi+000001b0]	8b 86 b0 01 00 00
-jmp 6F557913	e9 82 D0 10 6F
-nop	90
+4、MPMax float
+（1）ThisUnit + 98		// 参考sub_6F28A760
+例：08220320 + 98
+（2）[上面 + 28]		// 参考sub_6F467750
+例：[^+28] = 06BD
+（3）用算法0解开上面
+（4）解开后内容在[上面 + 84]	// 参考sub_6F467750
 
-7-10、攻击相关：int
-以攻击频率为参考的地址	0	1b0
-攻击 - 基础		-110	A0
-攻击 - 倍乘		-11C	94
-攻击 - 骰子		-128	88
-攻击 - 种类		-BC	F4
+5、经验值：[HeroAttributes + 8C]	int
+源代码：6F26DFF0
+即：getHeroExp()
 
-11、防御	[[00461018]+e0]		float
-（1）原来的代码
-6F13BD53:
-mov ecx,[esi+000000e0]	8b 8e e0 00 00 00
-（2）修改后
-6F13BD53:
-jmp 0044A8A0		e9 48 eb 30 91
-nop			90
-0044A8A0:
-mov [00461018],esi	89 35 18 10 46 00
-mov ecx,[esi+000000e0]	8b 8e e0 00 00 00
-jmp 6f13bd59		e9 a8 14 cf 6e
-nop			90
+6、力量初值：[HeroAttributes + 94]	int
+源代码：3F353D06
+即：int __thiscall DrawHeroProperty(int *GameContext, int **HeroAttributes, int *AttributeBias, unsigned int *GBuffer)
 
-12、防御 - 种类	int
-以防御为参考的地址	0	e0
-防御 - 种类		+4	+e4
+7、敏捷初值：[HeroAttributes + A8]	int
+源代码：同上
 
-AA0、1P金钱	[[0046101C]]（取下上16位，下16位见下一款）	int x10
-（1）原来的代码
-6F088E78:
-mov eax,[edx+78]	8b 42 78
-pop esi			5e
-pop ebx			5b
-（2）修改后
-6F088E78:
-jmp 0044A8c0		e9 43 1a 3c 91
-0044A8c0:
-mov [0046101C],edx	89 15 1c 10 46 00
-and [0046101C],ffff0000	81 25 1c 10 46 00 00 00 ff ff
-mov eax,[edx+78]	8b 42 78
-pop esi			5e
-pop ebx			5b
-jmp 6f088e7d		e9 a3 e5 c3 6e
+8、智力初值：int
+源代码：6F0DA9D0
+即：int __fastcall getHeroIntellect_NotSure(int pAttribute1)
+[HeroAttributes + 7C + 2 * 4] 记为Index1
+[HeroAttributes + 7C + 3 * 4] 记为ReferenceNumber1
+用算法1得到地址
 
-AA1、金钱总列表：[取下16位，上16位见上一款]
-（1）对每个玩家：
-金钱	    0	int x10
-木头	 + 80	int x10
-最大人口 +180	int
-当前人口 +200	int
-（2）玩家金钱位置（下16位）
+9、攻击频率：[UnitAttributes + 1B0]	float
+源代码：6F0C64E0
+即：int __thiscall getHeroROF_NotSure(int *this, int a2, int a3, int a4)
+
+10-13、攻击相关：int
+参考(攻击频率/UnitAttributes)	0	1B0	
+攻击 - 基础			-110	 A0
+攻击 - 倍乘			-11C	 94
+攻击 - 骰子			-128	 88
+攻击 - 种类			-BC	 F4
+
+14、移动速度：[参数 + 70h] float 单位的移动，或者[参数 + 78h] float 当前的移动速度
+源代码：6F201190
+即：void __thiscall sub_6F201190(int this, int a2, int a3)
+
+参数的获得：sub_6F077550:从6F077693开始
+参考1：6f2011a1: mov eax, [ecx+70]	ecx=07c50094
+< sub_6F201190(a1+0x70)
+< 6F077758(arg0 = 0012F874)
+参考2：断点下在6F0776F6
+> [ThisUnit + 1D8]记为MoveAbilityIndex
+例：06CE
+算法2(^)=07e23cd4记为I
+例：[I]=6F8BDBCC
+（
+Index依次等于：(This+1D8=)6CE       6CD       6C6、     6C5       6C4
+对应算法2结果：      07E23CD4、05AA0094、05A90094、07B50424、07B50448、07C50094
+Next         ：
+）
+while [I + 24] & [I + 28] != -1
+{
+	if [[I] + 2D4] == 6F201190（如果是6F052080，这个是空的）
+	{
+		[I + 70]为移动速度，或者用[I + 78]
+		exit
+	}
+
+	I = 算法2([I + 24]) = 05AA0094、05A90094、...、07C50094
+}
+
+> 如果[+2D4] != 6F201190则
+{
+> [^ + 24]作为Index
+06CD
+> 解index
+[ED236F4]=084BEEC4
+[^+54]= 05aa0094
+}
+
+15、防御：[ThisUnit + E0]	float
+源代码：6F353250
+6F3532A2: mov eax, dword ptr [ebx+e0]
+即：void __thiscall sub_6F353250(int this, int a2, int a3, int a4)
+
+16、防御类型：[ThisUnit + E4]	int
+
+三、金钱的修改
+参考：6F407220，看最后一段
+即：signed int __thiscall sub_6F407220(int this, signed int a2, unsigned int a3, int a4, int a5, int a6)
+
+1、上16位
+（1）[ThisGameMemory + 1 * 8 + 4]计为Address2
+（2）Address2上16位，下16位见下一款
+
+2、下16位
 1P	0190
 2P	1410
 3P	26a0
@@ -164,3 +158,11 @@ AA1、金钱总列表：[取下16位，上16位见上一款]
 8P	8350
 9P	95d0
 10P	a860
+
+3、对每个玩家
+金钱	    0	int x10
+木头	 + 80	int x10
+最大人口 +180	int
+当前人口 +200	int
+
+

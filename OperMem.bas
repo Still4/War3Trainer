@@ -6,16 +6,18 @@ Public Declare Function ReadProcessMemory Lib "Kernel32.dll" (ByVal hProcess As 
 Public Declare Function WriteProcessMemory Lib "Kernel32.dll" (ByVal hProcess As Long, ByVal lpBaseAddress As Long, lpBuffer As Any, ByVal nSize As Long, lpNumberOfBytesWritten As Any) As Long
 
 Public Type MEMORY_BASIC_INFORMATION
- BaseAddress As Long
- AllocationBase As Long
- AllocattionProtect As Long
- RegionSize As Long
- State As Long
- Protect As Long
- Type As Long
+    BaseAddress As Long
+    AllocationBase As Long
+    AllocattionProtect As Long
+    RegionSize As Long
+    State As Long
+    Protect As Long
+    Type As Long
 End Type
 Public Declare Function VirtualQueryEx Lib "Kernel32.dll" (ByVal hProcess As Long, ByVal lpAddress As Long, info As MEMORY_BASIC_INFORMATION, ByVal dwLength As Long) As Long
 Public Declare Function CloseHandle Lib "Kernel32.dll" (ByVal handle As Long) As Long
+
+Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
 
 Public Const READ_CONTROL = &H20000
 Public Const SYNCHRONIZE = &H100000
@@ -45,8 +47,8 @@ Private Const TOKEN_ADJUST_PRIVILEGES = (&H20)
 Private Const TOKEN_ADJUST_GROUPS = (&H40)
 Private Const TOKEN_ADJUST_DEFAULT = (&H80)
 Private Const TOKEN_ALL_ACCESS = (STANDARD_RIGHTS_REQUIRED Or TOKEN_ASSIGN_PRIMARY Or _
-TOKEN_DUPLICATE Or TOKEN_IMPERSONATE Or TOKEN_QUERY Or TOKEN_QUERY_SOURCE Or _
-TOKEN_ADJUST_PRIVILEGES Or TOKEN_ADJUST_GROUPS Or TOKEN_ADJUST_DEFAULT)
+                                TOKEN_DUPLICATE Or TOKEN_IMPERSONATE Or TOKEN_QUERY Or TOKEN_QUERY_SOURCE Or _
+                                TOKEN_ADJUST_PRIVILEGES Or TOKEN_ADJUST_GROUPS Or TOKEN_ADJUST_DEFAULT)
 Private Const SE_PRIVILEGE_ENABLED = &H2
 Private Const ANYSIZE_ARRAY = 1
 
@@ -68,16 +70,16 @@ End Type
 '获取占用内存
 Private Declare Function GetProcessMemoryInfo Lib "PSAPI.DLL" (ByVal hProcess As Long, ppsmemCounters As PROCESS_MEMORY_COUNTERS, ByVal cb As Long) As Long
 Private Type PROCESS_MEMORY_COUNTERS
-   cb As Long
-   PageFaultCount As Long
-   PeakWorkingSetSize As Long
-   workingSetSize As Long
-   QuotaPeakPagedPoolUsage As Long
-   QuotaPagedPoolUsage As Long
-   QuotaPeakNonPagedPoolUsage As Long
-   QuotaNonPagedPoolUsage As Long
-   PagefileUsage As Long
-   PeakPagefileUsage As Long
+    cb As Long
+    PageFaultCount As Long
+    PeakWorkingSetSize As Long
+    workingSetSize As Long
+    QuotaPeakPagedPoolUsage As Long
+    QuotaPagedPoolUsage As Long
+    QuotaPeakNonPagedPoolUsage As Long
+    QuotaNonPagedPoolUsage As Long
+    PagefileUsage As Long
+    PeakPagefileUsage As Long
 End Type
 
 Private FirstRWAddress As Long
@@ -113,7 +115,7 @@ Public Function GetMemorySize(ByVal lppid As Long) As Long
 End Function
 
 Sub EditMem(ByVal hProcess As Long, ByVal FirstAddress As Long, St() As Byte)
-    If FirstAddress < &H400000 Then Exit Sub
+    If FirstAddress < &H300000 Then Exit Sub
     Dim ProcessId As Long
     Dim r As Long
     Dim temp As Long
@@ -124,12 +126,12 @@ Sub EditMem(ByVal hProcess As Long, ByVal FirstAddress As Long, St() As Byte)
                            PROCESS_VM_READ Or PROCESS_VM_WRITE, False, ProcessId)
     If hProcess = 0 Then
        'MsgBox "OpenProcess Fail."
-       'Call Form1.reScanGame
+       Call frmMain.reScanGame
        Exit Sub
     End If
     
     nSize = UBound(St) - LBound(St) + 1
-    r = WriteProcessMemory(hProcess, FirstAddress, St(0), nSize, temp)
+    r = WriteProcessMemory(hProcess, FirstAddress, St(LBound(St)), nSize, temp)
     If r = 0 Then
         'MsgBox "WriteProcessMemory Fail."
     End If
@@ -138,7 +140,7 @@ Sub EditMem(ByVal hProcess As Long, ByVal FirstAddress As Long, St() As Byte)
 End Sub
 
 Sub ReadMem(ByVal hProcess As Long, ByVal FirstAddress As Long, St() As Byte)
-    If FirstAddress < &H400000 Then Exit Sub
+    If FirstAddress < &H300000 Then Exit Sub
     Dim ProcessId As Long
     Dim r As Long
     Dim temp As Long
@@ -148,14 +150,42 @@ Sub ReadMem(ByVal hProcess As Long, ByVal FirstAddress As Long, St() As Byte)
     hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0&, ProcessId)
     If hProcess = 0 Then
        'MsgBox "OpenProcess Fail."
-       'Call Form1.reScanGame
+       Call frmMain.reScanGame
        Exit Sub
     End If
     
     nSize = UBound(St) - LBound(St) + 1
-    r = ReadProcessMemory(hProcess, FirstAddress, St(0), nSize, temp)
+    r = ReadProcessMemory(hProcess, FirstAddress, St(LBound(St)), nSize, temp)
     If r = 0 Then
         'MsgBox "ReadProcessMemory Fail."
     End If
     CloseHandle hProcess
+End Sub
+
+Public Function ReadMemLong(ByVal hProcess As Long, ByVal FirstAddress As Long) As Long
+    Dim Buffer(1 To 4) As Byte
+
+    ReadMem hProcess, FirstAddress, Buffer
+    CopyMemory ReadMemLong, Buffer(1), 4
+End Function
+
+Public Function ReadMemFloat(ByVal hProcess As Long, ByVal FirstAddress As Long) As Single
+    Dim Buffer(1 To 4) As Byte
+
+    ReadMem hProcess, FirstAddress, Buffer
+    CopyMemory ReadMemFloat, Buffer(1), 4
+End Function
+
+Public Sub WriteMemLong(ByVal hProcess As Long, ByVal FirstAddress As Long, ByVal Value As Long)
+    Dim Buffer(1 To 4) As Byte
+    CopyMemory Buffer(1), Value, 4
+
+    EditMem hProcess, FirstAddress, Buffer
+End Sub
+
+Public Sub WriteMemFloat(ByVal hProcess As Long, ByVal FirstAddress As Long, ByVal Value As Single)
+    Dim Buffer(1 To 4) As Byte
+    CopyMemory Buffer(1), Value, 4
+
+    EditMem hProcess, FirstAddress, Buffer
 End Sub
