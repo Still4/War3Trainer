@@ -1,30 +1,34 @@
-[tc]魔兽3 1.22.0.6328内存修改器 程序员手册
-          [tc]天驰  2008.10.7
+[tc]魔兽3 内存修改器 v6 程序员手册
+       [tc]天驰  2008.10.26
 
-一、单位ESI的获得
-1、内存空洞：Read / Write：003D0000
-2、原来的部分：
-6F353D25:
-8b b4 24 ec 08 00 00	mov esi,[esp+000008ec]
+一、从选中单位的列表获得单位ESI
+0、也可以利用".?AUCUnitListNode@@"，以下没有用这个方法
+1、[6FAA2FFC]，参考sub_6F416AE0
+2、[上面+58+4*a2]，参考6f3a0564，a2不知道怎么取，目前取0即可
+3、[上面+34]记为链表基地址，参考6f2cc0a8
+这个地址还有一种获得方法，用.\CPlayerWar3.cpp所在的段+90，我不知道是否准确
+4、这个基地址的结构：
+[基地址+1F0]：表头
+[基地址+1F4]：表尾
+[基地址+1F8]：表长度
+参考sub_6F415B70: 6f415b95	mov eax, [ebx+1f4]
+5、展开当前地址（假设一开始等于表头）。
+即[表头]，其结构为：
+[节点+0]：下一个节点
+[节点+4]：not 下一个节点（二者为not关系，不知道为什么要这样）
+[节点+8]：单位ESI
+参考：6F412504 mov eax, [edi+0c](eax为节点位置)
+参考：6f412518 mov edi, [esi+08](edi为选中的单位，梦寐以求的单位ESI)
 
-6F353D25:
-e9 d6 c3 07 91	jmp 003D0100
-90		nop
-90		nop
-
-003D0100:
-8b b4 24 ec 08 00 00	mov esi,[esp+000008ec]
-89 35 00 00 3d 00	mov [003D0000], esi
-e9 1a 3c f8 6e		jmp 6F353D2C
-
-3、在6F353D25搞到的ESI，解开，
+二、重要说明
+1、ESI的使用
 ● ESI记为ThisUnit
 ● [ThisUnit + 1E4]记为UnitAttributes
 ● [ThisUnit + 1EC]记为HeroAttributes
 例：[08220320 + 1E4] = 07B60424
     [08220320 + 1EC] = 05AA0094
 
-4、重要的内存提取算法
+2、重要的内存提取算法
 算法0（6F03F180）：从GameMemory取得数据，需要索引号Index1和一个参考数ReferenceNumber1。注意Index1最高位不得为1，不然不是这个算法。建议判一下正负。
 （1）[6FAA4178]记为ThisGame
 例：[6FAA4178] = 02AE00B8
@@ -41,7 +45,7 @@ e9 1a 3c f8 6e		jmp 6F353D2C
 （1）[ThisGameMemory + Index1 * 8 + 4]，记为Address3
 （2）[Address3 + 20]为零的前提下返回[Address + 54]的内容
 
-二、单位的修改
+三、单位的修改
 1、HP float
 [HPMax地址-C]
 
@@ -139,7 +143,15 @@ while [I + 24] & [I + 28] != -1
 
 16、防御类型：[ThisUnit + E4]	int
 
-三、金钱的修改
+17、坐标X：
+[ThisUnit + 164]，参考：6F2776C4
+[上面+8]作为index，[上面+C]作为Refrence，用算法0，参考：6F464685
+[上面+78]，参考：6F38A52C
+[上面]为坐标X，参考：6f6de775
+
+18、[坐标Y] = [坐标X的地址 + 4]
+
+四、金钱的修改
 参考：6F407220，看最后一段
 即：signed int __thiscall sub_6F407220(int this, signed int a2, unsigned int a3, int a4, int a5, int a6)
 

@@ -15,7 +15,7 @@ Public Type MEMORY_BASIC_INFORMATION
     Type As Long
 End Type
 Public Declare Function VirtualQueryEx Lib "Kernel32.dll" (ByVal hProcess As Long, ByVal lpAddress As Long, info As MEMORY_BASIC_INFORMATION, ByVal dwLength As Long) As Long
-Public Declare Function CloseHandle Lib "Kernel32.dll" (ByVal handle As Long) As Long
+Public Declare Function CloseHandle Lib "Kernel32.dll" (ByVal Handle As Long) As Long
 
 Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
 
@@ -31,6 +31,7 @@ Public Const PROCESS_TERMINATE = &H1
 Public Const PROCESS_VM_OPERATION = &H8
 Public Const PROCESS_VM_READ = &H10
 Public Const PROCESS_VM_WRITE = &H20
+Public Const PROCESS_QUERY_INFORMATION = &H400
 
 'È¨ÏÞÌáÉý
 Private Declare Function GetCurrentProcess Lib "kernel32" () As Long
@@ -116,14 +117,14 @@ End Function
 
 Sub EditMem(ByVal hProcess As Long, ByVal FirstAddress As Long, St() As Byte)
     If FirstAddress < &H300000 Then Exit Sub
-    Dim ProcessId As Long
+    Dim ProcessID As Long
     Dim r As Long
     Dim temp As Long
     Dim nSize As Integer
     
-    ProcessId = hProcess
+    ProcessID = hProcess
     hProcess = OpenProcess(PROCESS_ALL_ACCESS Or PROCESS_TERMINATE Or PROCESS_VM_OPERATION Or _
-                           PROCESS_VM_READ Or PROCESS_VM_WRITE, False, ProcessId)
+                           PROCESS_VM_READ Or PROCESS_VM_WRITE, False, ProcessID)
     If hProcess = 0 Then
        'MsgBox "OpenProcess Fail."
        Call frmMain.reScanGame
@@ -141,13 +142,13 @@ End Sub
 
 Sub ReadMem(ByVal hProcess As Long, ByVal FirstAddress As Long, St() As Byte)
     If FirstAddress < &H300000 Then Exit Sub
-    Dim ProcessId As Long
+    Dim ProcessID As Long
     Dim r As Long
     Dim temp As Long
     Dim nSize As Integer
     
-    ProcessId = hProcess
-    hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0&, ProcessId)
+    ProcessID = hProcess
+    hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0&, ProcessID)
     If hProcess = 0 Then
        'MsgBox "OpenProcess Fail."
        Call frmMain.reScanGame
@@ -176,6 +177,17 @@ Public Function ReadMemFloat(ByVal hProcess As Long, ByVal FirstAddress As Long)
     CopyMemory ReadMemFloat, Buffer(1), 4
 End Function
 
+Public Function ReadMemChar4(ByVal hProcess As Long, ByVal FirstAddress As Long) As String
+    Dim Buffer(1 To 4) As Byte
+    Dim BufferInt As Long
+    BufferInt = ReadMemLong(hProcess, FirstAddress)
+    Buffer(1) = (BufferInt \ &H1000000) And &HFF
+    Buffer(2) = (BufferInt \ &H10000) And &HFF
+    Buffer(3) = (BufferInt \ &H100) And &HFF
+    Buffer(4) = BufferInt And &HFF
+    ReadMemChar4 = StrConv(Buffer, vbUnicode)
+End Function
+
 Public Sub WriteMemLong(ByVal hProcess As Long, ByVal FirstAddress As Long, ByVal Value As Long)
     Dim Buffer(1 To 4) As Byte
     CopyMemory Buffer(1), Value, 4
@@ -189,3 +201,23 @@ Public Sub WriteMemFloat(ByVal hProcess As Long, ByVal FirstAddress As Long, ByV
 
     EditMem hProcess, FirstAddress, Buffer
 End Sub
+
+Public Sub WriteMemChar4(ByVal hProcess As Long, ByVal FirstAddress As Long, ByVal Value As String)
+    Dim Buffer1(1 To 4) As Byte
+    Dim Buffer2() As Byte
+    Buffer2 = StrConv(Value, vbFromUnicode)
+    ReDim Preserve Buffer2(0 To 3)
+    Buffer1(1) = Buffer2(0)
+    Buffer1(2) = Buffer2(1)
+    Buffer1(3) = Buffer2(2)
+    Buffer1(4) = Buffer2(3)
+
+    Dim BufferInt As Long
+    BufferInt = &H1000000 * Buffer1(1) _
+            + &H10000 * Buffer1(2) _
+            + &H100& * Buffer1(3) _
+            + Buffer1(4)
+    
+    WriteMemLong hProcess, FirstAddress, BufferInt
+End Sub
+
