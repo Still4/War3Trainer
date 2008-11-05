@@ -82,30 +82,30 @@ Public Function getWar3Version() As String
     modVersion.Update
     
     Version = modVersion.iProductVersion
-    getWar3Version = "游戏版本：" & Version & vbCrLf & "评价："
+    getWar3Version = Version & "，"
         
     Select Case Version
     Case "1.20.4.6074"
         subVersion = "1.20e"
-        getWar3Version = getWar3Version & "该版本被完全支持"
+        getWar3Version = getWar3Version & "完全支持"
     Case "1.21.0.6263"
         subVersion = "1.21"
-        getWar3Version = getWar3Version & "该版本被完全支持"
+        getWar3Version = getWar3Version & "完全支持"
     Case "1.22.0.6328"
         subVersion = "1.22"
-        getWar3Version = getWar3Version & "该版本被完全支持"
+        getWar3Version = getWar3Version & "完全支持"
     Case Else
         subVersion = Left(Version, 4)
         Select Case subVersion
         Case "1.20"
-            getWar3Version = getWar3Version & "目前按照1.20.4.6074兼容运行，部分功能可能无法使用"
+            getWar3Version = getWar3Version & "兼容运行"
             subVersion = "1.20e"
         Case "1.21"
-            getWar3Version = getWar3Version & "目前按照1.20.4.6074兼容运行，部分功能可能无法使用"
+            getWar3Version = getWar3Version & "兼容运行"
         Case "1.22"
-            getWar3Version = getWar3Version & "目前按照1.22.0.6328兼容运行，部分功能可能无法使用"
+            getWar3Version = getWar3Version & "兼容运行"
         Case Else
-            getWar3Version = getWar3Version & "不可识别的版本。目前按照1.20.4.6074运行，功能可能无法使用"
+            getWar3Version = getWar3Version & "不可识别"
             subVersion = "1.20e"
         End Select
     End Select

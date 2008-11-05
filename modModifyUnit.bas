@@ -30,7 +30,9 @@ Public Sub goInject()
     Dim listHead As Long, listEnd As Long, listLength As Long
     Dim tmpAddress As Long
     tmpAddress = ReadMemLong(BroodHwnd, WAR3_ADDRESS_SELECTED_UNIT_LIST)
-    tmpAddress = ReadMemLong(BroodHwnd, tmpAddress + &H58 + 4 * 0)  ' 这个0比较玄乎，我猜的
+    Dim a2 As Long
+    a2 = ReadMemInteger(BroodHwnd, tmpAddress + &H28)
+    tmpAddress = ReadMemLong(BroodHwnd, tmpAddress + &H58 + 4 * a2) ' 这个a2比较玄乎
     tmpAddress = ReadMemLong(BroodHwnd, tmpAddress + &H34)
     
     listHead = ReadMemLong(BroodHwnd, tmpAddress + &H1F0)

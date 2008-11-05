@@ -163,6 +163,15 @@ Sub ReadMem(ByVal hProcess As Long, ByVal FirstAddress As Long, St() As Byte)
     CloseHandle hProcess
 End Sub
 
+Public Function ReadMemInteger(ByVal hProcess As Long, ByVal FirstAddress As Long) As Long
+    Dim Buffer(1 To 4) As Byte
+
+    ReadMem hProcess, FirstAddress, Buffer
+    Buffer(3) = 0
+    Buffer(4) = 0
+    CopyMemory ReadMemInteger, Buffer(1), 4
+End Function
+
 Public Function ReadMemLong(ByVal hProcess As Long, ByVal FirstAddress As Long) As Long
     Dim Buffer(1 To 4) As Byte
 
