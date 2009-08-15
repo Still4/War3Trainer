@@ -1,5 +1,5 @@
-[tc]魔兽3 内存修改器 v7 程序员手册
-       [tc]天驰  2008.11.5
+[tc]魔兽3 内存修改器 v8 程序员手册
+       [tc]天驰  2009.5.3
 
 一、从选中单位的列表获得单位ESI
 0、也可以利用".?AUCUnitListNode@@"，以下没有用这个方法
@@ -26,15 +26,11 @@
 ● ESI记为ThisUnit
 ● [ThisUnit + 1E4]记为UnitAttributes
 ● [ThisUnit + 1EC]记为HeroAttributes
-例：[08220320 + 1E4] = 07B60424
-    [08220320 + 1EC] = 05AA0094
 
 2、重要的内存提取算法
 算法0（6F03F180）：从GameMemory取得数据，需要索引号Index1和一个参考数ReferenceNumber1。注意Index1最高位不得为1，不然不是这个算法。建议判一下正负。
 （1）[6FAA4178]记为ThisGame
-例：[6FAA4178] = 02AE00B8
 （2）[ThisGame + 0xC]计为ThisGameMemory
-例：[02AE00B8 + C] = 0F060088
 （3）[ThisGameMemory + Index1 * 8 + 4]计为Address1，返回之
 （4）[Address1 + 0x18]应当等于ReferenceNumber1，不相等游戏会异常（访问地址0），所以做修改器不用考虑这里
 
@@ -52,11 +48,8 @@
 
 2、HPMax float
 （1）ThisUnit + 98		// 参考sub_6F28A760
-例：08220320 + 98
 （2）[上面 + 8]			// 参考sub_6F467710
-例：[82203C0] = 06BC
 （3）用算法0解开上面
-例：093E0AFC
 （4）解开后内容在[上面 + 84]	// 参考6F46752F: fcompp, EDX
 
 3、MP float
@@ -64,9 +57,7 @@
 
 4、MPMax float
 （1）ThisUnit + 98		// 参考sub_6F28A760
-例：08220320 + 98
 （2）[上面 + 28]		// 参考sub_6F467750
-例：[^+28] = 06BD
 （3）用算法0解开上面
 （4）解开后内容在[上面 + 84]	// 参考sub_6F467750
 
@@ -75,7 +66,7 @@
 即：getHeroExp()
 
 6、力量初值：[HeroAttributes + 94]	int
-源代码：3F353D06
+源代码：6F353D06
 即：int __thiscall DrawHeroProperty(int *GameContext, int **HeroAttributes, int *AttributeBias, unsigned int *GBuffer)
 
 7、敏捷初值：[HeroAttributes + A8]	int
@@ -99,43 +90,22 @@
 攻击 - 骰子			-128	 88
 攻击 - 种类			-BC	 F4
 
-14、移动速度：[参数 + 70h] float 单位的移动，或者[参数 + 78h] float 当前的移动速度
+14、移动速度：[“参数” + 70h] float 单位的移动(未叠加效果时)，
+        或者：[“参数” + 78h] float 当前的移动速度
 源代码：6F201190
 即：void __thiscall sub_6F201190(int this, int a2, int a3)
 
-参数的获得：sub_6F077550:从6F077693开始
-参考1：6f2011a1: mov eax, [ecx+70]	ecx=07c50094
-< sub_6F201190(a1+0x70)
-< 6F077758(arg0 = 0012F874)
-参考2：断点下在6F0776F6
-> [ThisUnit + 1D8]记为MoveAbilityIndex
-例：06CE
-算法2(^)=07e23cd4记为I
-例：[I]=6F8BDBCC
-（
-Index依次等于：(This+1D8=)6CE       6CD       6C6、     6C5       6C4
-对应算法2结果：      07E23CD4、05AA0094、05A90094、07B50424、07B50448、07C50094
-Next         ：
-）
-while [I + 24] & [I + 28] != -1
-{
-	if [[I] + 2D4] == 6F201190（如果是6F052080，这个是空的）
-	{
-		[I + 70]为移动速度，或者用[I + 78]
-		exit
-	}
+而“参数”的获得：似乎是将某个指针压入一系列（回调）函数中处理，但是大部分的处理函数是空白的，只有一个与移动速度有关。写修改器，就是要依次检索这些函数，直到发现这个函数后，代入这个函数的参数，计算出移动速度所需的“参数”
 
-	I = 算法2([I + 24]) = 05AA0094、05A90094、...、07C50094
-}
-
-> 如果[+2D4] != 6F201190则
-{
-> [^ + 24]作为Index
-06CD
-> 解index
-[ED236F4]=084BEEC4
-[^+54]= 05aa0094
-}
+整件事情是从6F077693开始
+（1）[ThisUnit + 1D8]记为MoveAbilityIndex
+参考：断点下在6F0776F6
+（2）算法2(MoveAbilityIndex) 记为I
+（3）此时，只要[I + 24] & [I + 28] != -1，那么：
+（4）检验[[I] + 2D4]是否等于6F201190（如果是6F052080，实际执行的函数只有ret指令）
+（5）如果是相等的，那么算法结束，用[I + 70]或者[I + 78]得到移动速度
+源代码：6f2011a1: mov eax, [ecx+70]	ecx=07c50094
+（6）如果不相等，那么下一个I = 算法2([I + 24]
 
 15、防御：[ThisUnit + E0]	float
 源代码：6F353250
@@ -171,6 +141,8 @@ while [I + 24] & [I + 28] != -1
 8P	8350
 9P	95d0
 10P	a860
+11P	bae0
+12P	cd70
 
 3、对每个玩家
 金钱	    0	int x10
@@ -178,4 +150,20 @@ while [I + 24] & [I + 28] != -1
 最大人口 +180	int
 当前人口 +200	int
 
+五、物品列表的获取
+1、GetAnItem (SelectedUnit, ItemIndex)，其中ItemIndex = 0 - 5
+源代码：sub_6F26E0E0
+过程为：
+（1）[SelectedUnit + 1F4]记为List
+（2）如果List为0，返回0
+（3）否则判断ItemIndex是否越界，我们就不判了
+参考：6F0F04B0
+即：GetListItem(List, ItemIndex)
+（4）List + C * ItemIndex + 0x70，记为Index1，注意没有解引用啊
+（5）算法0，地址[Index1]，参考值[Index1 + 4]，结果记为RawItem
+（6）RawItem为0或者[RawItem+0x20]不为0，导致返回0
+（7）[RawItem+0x54]作为物品基地址，即为CurrentItem
 
+六、物品修改
+1、使用次数 [CurrentItem + 84]
+2、名称 [CurrentItem + 30]
