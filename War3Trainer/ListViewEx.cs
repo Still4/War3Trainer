@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace War3Trainer
 {
-    public partial class ucListViewEx : ListView
+    public partial class ListViewEx : ListView
     {
         private const int WM_HSCROLL = 0x0114;
         private const int WM_VSCROLL = 0x0115;
@@ -18,20 +12,23 @@ namespace War3Trainer
 
         public event System.EventHandler Scrolling;
 	
-        public ucListViewEx()
+        public ListViewEx()
         {
             InitializeComponent();
         }
 
+        [System.Security.Permissions.SecurityPermission(System.Security.Permissions.SecurityAction.LinkDemand, Flags = System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
         {
             if (m.Msg == WM_VSCROLL ||
                 m.Msg == WM_HSCROLL ||
                 m.Msg == WM_KEYDOWN ||
                 m.Msg == WM_MOUSEWHEEL)
+            {
                 if (Scrolling != null)
                     Scrolling(this, new EventArgs());
-            
+            }
+
             base.WndProc(ref m);
         }
     }

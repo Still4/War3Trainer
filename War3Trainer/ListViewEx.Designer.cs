@@ -1,6 +1,6 @@
 ﻿namespace War3Trainer
 {
-    partial class ucListViewEx
+    partial class ListViewEx
     {
         /// <summary>
         /// 必需的设计器变量。

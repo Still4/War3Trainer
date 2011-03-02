@@ -1,6 +1,6 @@
 ﻿namespace War3Trainer
 {
-    partial class frmMain
+    partial class FrmMain
     {
         /// <summary>
         /// 必需的设计器变量。
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             this.ToolContainer = new System.Windows.Forms.ToolStripContainer();
             this.ToolStripMain = new System.Windows.Forms.ToolStrip();
             this.labGameScanState = new System.Windows.Forms.ToolStripLabel();
@@ -41,22 +41,25 @@
             this.MenuFileExit = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.SplitterMain = new System.Windows.Forms.TableLayoutPanel();
             this.viewFunctions = new System.Windows.Forms.TreeView();
             this.cmdGetAllObjects = new System.Windows.Forms.Button();
             this.cmdModify = new System.Windows.Forms.Button();
-            this.viewData = new War3Trainer.ucListViewEx();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.txtInput = new System.Windows.Forms.TextBox();
             this.txtIntroduction = new System.Windows.Forms.TextBox();
+            this.splitMain = new System.Windows.Forms.SplitContainer();
+            this.lblEmpty = new System.Windows.Forms.Label();
+            this.viewData = new War3Trainer.ListViewEx();
+            this.colName = new System.Windows.Forms.ColumnHeader();
+            this.colOriginalValue = new System.Windows.Forms.ColumnHeader();
+            this.colUnsavedValue = new System.Windows.Forms.ColumnHeader();
+            this.txtInput = new System.Windows.Forms.TextBox();
             this.ToolContainer.ContentPanel.SuspendLayout();
             this.ToolContainer.TopToolStripPanel.SuspendLayout();
             this.ToolContainer.SuspendLayout();
             this.ToolStripMain.SuspendLayout();
             this.MenuMain.SuspendLayout();
-            this.SplitterMain.SuspendLayout();
+            this.splitMain.Panel1.SuspendLayout();
+            this.splitMain.Panel2.SuspendLayout();
+            this.splitMain.SuspendLayout();
             this.viewData.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,11 +69,11 @@
             // ToolContainer.ContentPanel
             // 
             this.ToolContainer.ContentPanel.Controls.Add(this.ToolStripMain);
-            this.ToolContainer.ContentPanel.Size = new System.Drawing.Size(538, 27);
+            this.ToolContainer.ContentPanel.Size = new System.Drawing.Size(535, 27);
             this.ToolContainer.Dock = System.Windows.Forms.DockStyle.Top;
             this.ToolContainer.Location = new System.Drawing.Point(0, 0);
             this.ToolContainer.Name = "ToolContainer";
-            this.ToolContainer.Size = new System.Drawing.Size(538, 51);
+            this.ToolContainer.Size = new System.Drawing.Size(535, 51);
             this.ToolContainer.TabIndex = 2;
             this.ToolContainer.Text = "toolStripContainer1";
             // 
@@ -87,7 +90,7 @@
             this.ToolStripMain.Location = new System.Drawing.Point(0, 0);
             this.ToolStripMain.Name = "ToolStripMain";
             this.ToolStripMain.Padding = new System.Windows.Forms.Padding(3, 2, 0, 2);
-            this.ToolStripMain.Size = new System.Drawing.Size(538, 27);
+            this.ToolStripMain.Size = new System.Drawing.Size(535, 27);
             this.ToolStripMain.TabIndex = 0;
             this.ToolStripMain.Text = "toolStrip1";
             // 
@@ -123,7 +126,7 @@
             this.MenuHelp});
             this.MenuMain.Location = new System.Drawing.Point(0, 0);
             this.MenuMain.Name = "MenuMain";
-            this.MenuMain.Size = new System.Drawing.Size(538, 24);
+            this.MenuMain.Size = new System.Drawing.Size(535, 24);
             this.MenuMain.TabIndex = 0;
             this.MenuMain.Text = "menuStrip1";
             // 
@@ -171,101 +174,119 @@
             this.MenuHelpAbout.Text = "关于修改器(&A)";
             this.MenuHelpAbout.Click += new System.EventHandler(this.MenuHelpAbout_Click);
             // 
-            // SplitterMain
-            // 
-            this.SplitterMain.ColumnCount = 5;
-            this.SplitterMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 210F));
-            this.SplitterMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 8F));
-            this.SplitterMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.SplitterMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 86F));
-            this.SplitterMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 81F));
-            this.SplitterMain.Controls.Add(this.viewFunctions, 0, 0);
-            this.SplitterMain.Controls.Add(this.cmdGetAllObjects, 3, 1);
-            this.SplitterMain.Controls.Add(this.cmdModify, 4, 1);
-            this.SplitterMain.Controls.Add(this.viewData, 2, 0);
-            this.SplitterMain.Controls.Add(this.txtIntroduction, 2, 0);
-            this.SplitterMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SplitterMain.Location = new System.Drawing.Point(0, 51);
-            this.SplitterMain.Name = "SplitterMain";
-            this.SplitterMain.Padding = new System.Windows.Forms.Padding(4, 4, 8, 4);
-            this.SplitterMain.RowCount = 2;
-            this.SplitterMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.SplitterMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.SplitterMain.Size = new System.Drawing.Size(538, 395);
-            this.SplitterMain.TabIndex = 0;
-            this.SplitterMain.Paint += new System.Windows.Forms.PaintEventHandler(this.SplitterMain_Paint);
-            // 
             // viewFunctions
             // 
             this.viewFunctions.Dock = System.Windows.Forms.DockStyle.Fill;
             this.viewFunctions.HideSelection = false;
-            this.viewFunctions.Location = new System.Drawing.Point(7, 7);
+            this.viewFunctions.Location = new System.Drawing.Point(0, 0);
             this.viewFunctions.Name = "viewFunctions";
-            this.viewFunctions.Size = new System.Drawing.Size(204, 341);
+            this.viewFunctions.Size = new System.Drawing.Size(165, 341);
             this.viewFunctions.TabIndex = 0;
             this.viewFunctions.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.viewFunctions_BeforeSelect);
             // 
             // cmdGetAllObjects
             // 
-            this.cmdGetAllObjects.Location = new System.Drawing.Point(366, 360);
+            this.cmdGetAllObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmdGetAllObjects.Location = new System.Drawing.Point(367, 411);
             this.cmdGetAllObjects.Margin = new System.Windows.Forms.Padding(3, 9, 3, 3);
             this.cmdGetAllObjects.Name = "cmdGetAllObjects";
             this.cmdGetAllObjects.Size = new System.Drawing.Size(75, 23);
-            this.cmdGetAllObjects.TabIndex = 2;
+            this.cmdGetAllObjects.TabIndex = 1;
             this.cmdGetAllObjects.Text = "刷新";
             this.cmdGetAllObjects.UseVisualStyleBackColor = true;
             this.cmdGetAllObjects.Click += new System.EventHandler(this.cmdGetAllObjects_Click);
             // 
             // cmdModify
             // 
-            this.cmdModify.Location = new System.Drawing.Point(452, 360);
+            this.cmdModify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmdModify.Location = new System.Drawing.Point(448, 411);
             this.cmdModify.Margin = new System.Windows.Forms.Padding(3, 9, 3, 3);
             this.cmdModify.Name = "cmdModify";
             this.cmdModify.Size = new System.Drawing.Size(75, 23);
-            this.cmdModify.TabIndex = 3;
+            this.cmdModify.TabIndex = 2;
             this.cmdModify.Text = "修改";
             this.cmdModify.UseVisualStyleBackColor = true;
             this.cmdModify.Click += new System.EventHandler(this.cmdModify_Click);
             // 
+            // txtIntroduction
+            // 
+            this.txtIntroduction.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtIntroduction.Location = new System.Drawing.Point(17, 14);
+            this.txtIntroduction.Multiline = true;
+            this.txtIntroduction.Name = "txtIntroduction";
+            this.txtIntroduction.ReadOnly = true;
+            this.txtIntroduction.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtIntroduction.Size = new System.Drawing.Size(139, 53);
+            this.txtIntroduction.TabIndex = 0;
+            this.txtIntroduction.Text = resources.GetString("txtIntroduction.Text");
+            // 
+            // splitMain
+            // 
+            this.splitMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitMain.Location = new System.Drawing.Point(8, 58);
+            this.splitMain.Name = "splitMain";
+            // 
+            // splitMain.Panel1
+            // 
+            this.splitMain.Panel1.Controls.Add(this.viewFunctions);
+            // 
+            // splitMain.Panel2
+            // 
+            this.splitMain.Panel2.Controls.Add(this.lblEmpty);
+            this.splitMain.Panel2.Controls.Add(this.viewData);
+            this.splitMain.Panel2.Controls.Add(this.txtIntroduction);
+            this.splitMain.Size = new System.Drawing.Size(515, 341);
+            this.splitMain.SplitterDistance = 165;
+            this.splitMain.SplitterWidth = 6;
+            this.splitMain.TabIndex = 0;
+            // 
+            // lblEmpty
+            // 
+            this.lblEmpty.AutoSize = true;
+            this.lblEmpty.Location = new System.Drawing.Point(167, 14);
+            this.lblEmpty.Name = "lblEmpty";
+            this.lblEmpty.Size = new System.Drawing.Size(113, 36);
+            this.lblEmpty.TabIndex = 1;
+            this.lblEmpty.Text = "没有可修改的项目，\r\n请在左侧功能列表中\r\n选择一个修改项。";
+            // 
             // viewData
             // 
             this.viewData.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3});
-            this.SplitterMain.SetColumnSpan(this.viewData, 3);
+            this.colName,
+            this.colOriginalValue,
+            this.colUnsavedValue});
             this.viewData.Controls.Add(this.txtInput);
-            this.viewData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.viewData.FullRowSelect = true;
             this.viewData.GridLines = true;
             this.viewData.HideSelection = false;
-            this.viewData.Location = new System.Drawing.Point(225, 7);
+            this.viewData.Location = new System.Drawing.Point(17, 73);
             this.viewData.MultiSelect = false;
             this.viewData.Name = "viewData";
-            this.viewData.Size = new System.Drawing.Size(302, 341);
-            this.viewData.TabIndex = 1;
+            this.viewData.Size = new System.Drawing.Size(302, 134);
+            this.viewData.TabIndex = 2;
             this.viewData.UseCompatibleStateImageBehavior = false;
             this.viewData.View = System.Windows.Forms.View.Details;
-            this.viewData.Visible = false;
             this.viewData.Scrolling += new System.EventHandler(this.viewData_Scrolling);
             this.viewData.MouseUp += new System.Windows.Forms.MouseEventHandler(this.viewData_MouseUp);
             this.viewData.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.viewData_KeyPress);
             this.viewData.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.viewData_ColumnWidthChanging);
             // 
-            // columnHeader1
+            // colName
             // 
-            this.columnHeader1.Text = "修改项目名称";
-            this.columnHeader1.Width = 120;
+            this.colName.Text = "修改项目名称";
+            this.colName.Width = 120;
             // 
-            // columnHeader2
+            // colOriginalValue
             // 
-            this.columnHeader2.Text = "原值";
-            this.columnHeader2.Width = 80;
+            this.colOriginalValue.Text = "原值";
+            this.colOriginalValue.Width = 80;
             // 
-            // columnHeader3
+            // colUnsavedValue
             // 
-            this.columnHeader3.Text = "目标数值";
-            this.columnHeader3.Width = 80;
+            this.colUnsavedValue.Text = "目标数值";
+            this.colUnsavedValue.Width = 80;
             // 
             // txtInput
             // 
@@ -281,29 +302,18 @@
             this.txtInput.Leave += new System.EventHandler(this.txtInput_Leave);
             this.txtInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtInput_KeyPress);
             // 
-            // txtIntroduction
-            // 
-            this.txtIntroduction.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.SplitterMain.SetColumnSpan(this.txtIntroduction, 3);
-            this.txtIntroduction.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtIntroduction.Location = new System.Drawing.Point(7, 354);
-            this.txtIntroduction.Multiline = true;
-            this.txtIntroduction.Name = "txtIntroduction";
-            this.txtIntroduction.ReadOnly = true;
-            this.txtIntroduction.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtIntroduction.Size = new System.Drawing.Size(353, 34);
-            this.txtIntroduction.TabIndex = 4;
-            this.txtIntroduction.Text = resources.GetString("txtIntroduction.Text");
-            // 
-            // frmMain
+            // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(538, 446);
-            this.Controls.Add(this.SplitterMain);
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(535, 446);
+            this.Controls.Add(this.splitMain);
+            this.Controls.Add(this.cmdModify);
+            this.Controls.Add(this.cmdGetAllObjects);
             this.Controls.Add(this.ToolContainer);
-            this.Name = "frmMain";
-            this.Text = "魔兽3内存修改器 v8";
+            this.Name = "FrmMain";
+            this.Text = "魔兽3内存修改器 v9";
             this.ToolContainer.ContentPanel.ResumeLayout(false);
             this.ToolContainer.ContentPanel.PerformLayout();
             this.ToolContainer.TopToolStripPanel.ResumeLayout(false);
@@ -314,8 +324,10 @@
             this.ToolStripMain.PerformLayout();
             this.MenuMain.ResumeLayout(false);
             this.MenuMain.PerformLayout();
-            this.SplitterMain.ResumeLayout(false);
-            this.SplitterMain.PerformLayout();
+            this.splitMain.Panel1.ResumeLayout(false);
+            this.splitMain.Panel2.ResumeLayout(false);
+            this.splitMain.Panel2.PerformLayout();
+            this.splitMain.ResumeLayout(false);
             this.viewData.ResumeLayout(false);
             this.viewData.PerformLayout();
             this.ResumeLayout(false);
@@ -332,20 +344,21 @@
         private System.Windows.Forms.ToolStripMenuItem MenuHelpAbout;
         private System.Windows.Forms.ToolStrip ToolStripMain;
         private System.Windows.Forms.ToolStripLabel labGameScanState;
-        private System.Windows.Forms.TableLayoutPanel SplitterMain;
         private System.Windows.Forms.TreeView viewFunctions;
         private System.Windows.Forms.Button cmdGetAllObjects;
         private System.Windows.Forms.Button cmdModify;
-        private ucListViewEx viewData;
+        private ListViewEx viewData;
         private System.Windows.Forms.ToolStripButton cmdScanGame;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader colName;
+        private System.Windows.Forms.ColumnHeader colOriginalValue;
+        private System.Windows.Forms.ColumnHeader colUnsavedValue;
         private System.Windows.Forms.TextBox txtIntroduction;
         private System.Windows.Forms.TextBox txtInput;
         private System.Windows.Forms.ToolStripMenuItem MenuDebug1;
         private System.Windows.Forms.ToolStripSeparator MenuSplitor1;
+        private System.Windows.Forms.SplitContainer splitMain;
+        private System.Windows.Forms.Label lblEmpty;
     }
 }
 

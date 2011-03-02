@@ -1,26 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace War3Trainer
 {
-    public partial class frmMain : Form
+    public partial class FrmMain : Form
     {
-        clsGameContext CurrentGameContext = null;
-        clsGameTrainer MainTrainer = null;
+        private GameContext _currentGameContext;
+        private GameTrainer _mainTrainer;
 
-        public frmMain()
+        public FrmMain()
         {
             InitializeComponent();
 
-            WindowsApi.ProcessToken.SetPrivilege();
+            try
+            {
+                System.Diagnostics.Process.EnterDebugMode();
+            }
+            catch (Exception ex)
+            {
+                this.labGameScanState.Text = ex.Message + "请以管理员身份运行";
+            }
+
             FindGame();
-            txtIntroduction.Select(0, 0);     // Cancle select all
+            txtIntroduction.Select(0, 0);     // Cancle select all in introduction box
+            SetRightGrid(RightFunction.Introduction);
         }
 
         /************************************************************************/
@@ -28,49 +32,53 @@ namespace War3Trainer
         /************************************************************************/
         private void FindGame()
         {
-            bool IsRecognized = false;
+            bool isRecognized = false;
             try
             {
-                CurrentGameContext = clsGameContext.FindGameRunning("war3");
-                if (CurrentGameContext != null)
+                _currentGameContext = GameContext.FindGameRunning("war3", "game.dll");
+                if (_currentGameContext != null)
                 {
                     // Game online
                     labGameScanState.Text = "检测到游戏（"
-                        + CurrentGameContext.ProcessID.ToString()
+                        + _currentGameContext.ProcessId.ToString()
                         + "），游戏版本 "
-                        + CurrentGameContext.ProcessVersion;
+                        + _currentGameContext.ProcessVersion;
 
                     // Get a new trainer
                     GetAllObject();
 
-                    IsRecognized = true;
+                    isRecognized = true;
                 }
                 else
                 {
                     // Game offline
                     labGameScanState.Text = "游戏未运行，运行游戏后单击“查找游戏”";
                 }
-                
             }
             catch (UnkonwnGameVersionExpection e)
             {
                 // Unknown game version
-                CurrentGameContext = null;
+                _currentGameContext = null;
                 labGameScanState.Text = "检测到游戏（"
-                        + e.ProcessId.ToString()
-                        + "），但版本（"
-                        + e.FileVersion
-                        + "）不被支持";
+                    + e.ProcessId.ToString()
+                    + "），但版本（"
+                    + e.FileVersion
+                    + "）不被支持";
+            }
+            catch (WindowsApi.BadProcessIdException exception)
+            {
+                this._currentGameContext = null;
+                this.labGameScanState.Text = "错误的进程Id：" + exception.ProcessId.ToString();
             }
             catch
             {
                 // Why here?
-                CurrentGameContext = null;
+                _currentGameContext = null;
                 labGameScanState.Text = "检测游戏版本时发生严重错误，请重试上一次的操作";
             }
 
             // Enable buttons
-            if (IsRecognized)
+            if (isRecognized)
             {
                 viewFunctions.Enabled = true;
                 viewData.Enabled = true;
@@ -89,13 +97,13 @@ namespace War3Trainer
         private void GetAllObject()
         {
             // Get a new trainer
-            if (CurrentGameContext == null)
+            if (_currentGameContext == null)
                 return;
-            MainTrainer = new clsGameTrainer(CurrentGameContext);
+            _mainTrainer = new GameTrainer(_currentGameContext);
 
             // Create function tree
             viewFunctions.Nodes.Clear();
-            foreach (ITrainerNode CurrentFunction in MainTrainer.GetFunctionList())
+            foreach (ITrainerNode CurrentFunction in _mainTrainer.GetFunctionList())
             {
                 TreeNode[] ParentNodes = viewFunctions.Nodes.Find(CurrentFunction.ParentIndex.ToString(), true);
                 TreeNodeCollection ParentTree;
@@ -103,7 +111,7 @@ namespace War3Trainer
                     ParentTree = viewFunctions.Nodes;
                 else
                     ParentTree = ParentNodes[0].Nodes;
-                
+
                 ParentTree.Add(
                     CurrentFunction.NodeIndex.ToString(),
                     CurrentFunction.NodeTypeName)
@@ -142,8 +150,7 @@ namespace War3Trainer
             // Show introduction page
             if (Node.NodeType == TrainerNodeType.Introduction)
             {
-                viewData.Visible = false;
-                txtIntroduction.Visible = true;
+                SetRightGrid(RightFunction.Introduction);
             }
             else
             {
@@ -151,38 +158,34 @@ namespace War3Trainer
                 FillAddressList(Node.NodeIndex);
                 
                 // Show address list
-                txtIntroduction.Visible = false;
-
                 if (viewData.Items.Count > 0)
-                    viewData.Visible = true;
+                    SetRightGrid(RightFunction.EditTable);
                 else
-                    viewData.Visible = false;
+                    SetRightGrid(RightFunction.Empty);
             }            
         }
 
-        private void FillAddressList(int FunctionNodeId)
+        private void FillAddressList(int functionNodeId)
         {
             // To set the right window
-            var AddressListInThisTree =
-                from AddressLine in MainTrainer.GetAddressList()
-                where AddressLine.ParentIndex == FunctionNodeId
-                select AddressLine;
-
             viewData.Items.Clear();
-            foreach (IAddressNode AddressLine in AddressListInThisTree)
+            foreach (IAddressNode addressLine in _mainTrainer.GetAddressList())
             {
+                if (addressLine.ParentIndex != functionNodeId)
+                    continue;
+
                 viewData.Items.Add(new ListViewItem(
                     new string[]
                     {
-                        AddressLine.Caption,    // Caption
+                        addressLine.Caption,    // Caption
                         "",                     // Original value
                         ""                      // Modified value
                     }));
-                viewData.Items[viewData.Items.Count - 1].Tag = AddressLine;
+                viewData.Items[viewData.Items.Count - 1].Tag = addressLine;
             }
 
             // To get memory content
-            using (WindowsApi.clsProcessMemory Mem = new WindowsApi.clsProcessMemory(CurrentGameContext.ProcessID))
+            using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_currentGameContext.ProcessId))
             {
                 foreach (ListViewItem CurrentItem in viewData.Items)
                 {
@@ -194,15 +197,15 @@ namespace War3Trainer
                     switch (AddressLine.ValueType)
                     {
                         case AddressListValueType.Integer:
-                            ItemValue = Mem.ReadInt32((IntPtr)AddressLine.Address)
+                            ItemValue = mem.ReadInt32((IntPtr)AddressLine.Address)
                                 / AddressLine.ValueScale;
                             break;
                         case AddressListValueType.Float:
-                            ItemValue = Mem.ReadFloat((IntPtr)AddressLine.Address)
+                            ItemValue = mem.ReadFloat((IntPtr)AddressLine.Address)
                                 / AddressLine.ValueScale;
                             break;
                         case AddressListValueType.Char4:
-                            ItemValue = Mem.ReadChar4((IntPtr)AddressLine.Address);
+                            ItemValue = mem.ReadChar4((IntPtr)AddressLine.Address);
                             break;
                         default:
                             ItemValue = "";
@@ -216,7 +219,7 @@ namespace War3Trainer
         // To apply the modifications
         private void ApplyModify()
         {
-            using (WindowsApi.clsProcessMemory Mem = new WindowsApi.clsProcessMemory(CurrentGameContext.ProcessID))
+            using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_currentGameContext.ProcessId))
             {
                 foreach (ListViewItem CurrentItem in viewData.Items)
                 {
@@ -234,19 +237,21 @@ namespace War3Trainer
                     switch (AddressLine.ValueType)
                     {
                         case AddressListValueType.Integer:
-                            Int32 IntValue;
-                            Int32.TryParse(ItemValueString, out IntValue);
-                            IntValue = (Int32)(unchecked(IntValue * AddressLine.ValueScale));
-                            Mem.WriteInt32((IntPtr)AddressLine.Address, IntValue);
+                            Int32 intValue;
+                            if (!Int32.TryParse(ItemValueString, out intValue))
+                                intValue = 0;
+                            intValue = (Int32)(unchecked(intValue * AddressLine.ValueScale));
+                            mem.WriteInt32((IntPtr)AddressLine.Address, intValue);
                             break;
                         case AddressListValueType.Float:
-                            float FloatValue;
-                            float.TryParse(ItemValueString, out FloatValue);
-                            FloatValue = unchecked(FloatValue * AddressLine.ValueScale);
-                            Mem.WriteFloat((IntPtr)AddressLine.Address, FloatValue);
+                            float floatValue;
+                            if (!float.TryParse(ItemValueString, out floatValue))
+                                floatValue = 0;
+                            floatValue = unchecked(floatValue * AddressLine.ValueScale);
+                            mem.WriteFloat((IntPtr)AddressLine.Address, floatValue);
                             break;
                         case AddressListValueType.Char4:
-                            Mem.WriteChar4((IntPtr)AddressLine.Address, ItemValueString);
+                            mem.WriteChar4((IntPtr)AddressLine.Address, ItemValueString);
                             break;
                     }
                     CurrentItem.SubItems[2].Text = "";
@@ -261,7 +266,7 @@ namespace War3Trainer
         {
             this.Close();
         }
-                
+
         private void MenuHelpAbout_Click(object sender, EventArgs e)
         {
             MessageBox.Show("要求还挺高……" + System.Environment.NewLine + System.Environment.NewLine
@@ -311,35 +316,23 @@ namespace War3Trainer
             }
         }
 
-
         private void viewFunctions_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
             // Check whether modification is not saved
-            bool IsSaved = true;
+            bool isSaved = true;
             foreach (ListViewItem CurrentItem in viewData.Items)
             {
                 if (CurrentItem.SubItems[2].Text != "")
                 {
-                    IsSaved = false;
+                    isSaved = false;
                     break;
                 }
             }
-            if (!IsSaved)
+
+            // Save all if not saved
+            if (!isSaved)
             {
-                DialogResult retToSave = MessageBox.Show(
-                    "一些修改还没有保存，现在应用这些修改吗？",
-                    "保存",
-                    MessageBoxButtons.YesNoCancel,
-                    MessageBoxIcon.Question);
-                switch (retToSave)
-                {
-                    case DialogResult.Yes:
-                        cmdModify_Click(this, null);
-                        break;
-                    case DialogResult.Cancel:
-                        e.Cancel = true;
-                        return;
-                }
+                cmdModify_Click(this, null);
             }
 
             // Select another function
@@ -353,16 +346,29 @@ namespace War3Trainer
             }
         }
 
-        private Brush brushBlack = new SolidBrush(Color.FromKnownColor(KnownColor.ControlText));
-        private void SplitterMain_Paint(object sender, PaintEventArgs e)
+        private enum RightFunction
         {
-            e.Graphics.DrawString(
-                  "没有可修改的项目，" + Environment.NewLine
-                + "请在左侧功能列表中" + Environment.NewLine
-                + "选择一个修改项。",
-                this.Font,
-                brushBlack,
-                viewData.Location);
+            Empty,
+            Introduction,
+            EditTable,
+        }
+
+        private void SetRightGrid(RightFunction function)
+        {
+            this.splitMain.Panel2.SuspendLayout();
+            this.viewData.SuspendLayout();
+
+            txtIntroduction.Visible = function == RightFunction.Introduction;
+            viewData.Visible = function == RightFunction.EditTable;
+            lblEmpty.Visible = function == RightFunction.Empty;
+
+            txtIntroduction.Dock = DockStyle.Fill;
+            viewData.Dock = DockStyle.Fill;
+            lblEmpty.Location = new Point(0, 0);
+
+            this.viewData.ResumeLayout(false);
+            this.splitMain.Panel2.ResumeLayout(false);
+            this.splitMain.Panel2.PerformLayout();
         }
 
         //////////////////////////////////////////////////////////////////////////       
@@ -477,22 +483,25 @@ namespace War3Trainer
                 return;
 
             Int32 nIndex;
-            Int32.TryParse(
+            if (!Int32.TryParse(
                 strIndex,
                 System.Globalization.NumberStyles.HexNumber,
                 System.Globalization.NumberFormatInfo.InvariantInfo,
-                out nIndex);
+                out nIndex))
+            {
+                nIndex = 0;
+            }
 
             UInt32 Result = 0;
             try
             {
-                using (WindowsApi.clsProcessMemory Mem = new WindowsApi.clsProcessMemory(CurrentGameContext.ProcessID))
+                using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_currentGameContext.ProcessId))
                 {
-                    NewChildrenEventArgs Args = new NewChildrenEventArgs();
+                    NewChildrenEventArgs args = new NewChildrenEventArgs();
                     War3Common.GetGameMemory(
-                        CurrentGameContext, ref Args);
+                        _currentGameContext, ref args);
                     Result = War3Common.ReadFromGameMemory(
-                        Mem, CurrentGameContext, Args,
+                        mem, _currentGameContext, args,
                         nIndex);
                 }
             }
