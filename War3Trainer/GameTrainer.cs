@@ -623,7 +623,7 @@ namespace War3Trainer
                 unchecked(_newChildrenArgs.pUnitAttributes + 0x1B0),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
-                "默认攻击范围",
+                "主动攻击范围",
                 unchecked(_newChildrenArgs.pUnitAttributes + 0x244),
                 AddressListValueType.Float));
             

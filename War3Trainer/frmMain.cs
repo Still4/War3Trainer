@@ -12,7 +12,6 @@ namespace War3Trainer
         public FrmMain()
         {
             InitializeComponent();
-            txtIntroduction.Select(0, 0);     // Cancle select all in introduction box
             SetRightGrid(RightFunction.Introduction);
         }
 
@@ -21,12 +20,14 @@ namespace War3Trainer
             try
             {
                 System.Diagnostics.Process.EnterDebugMode();
-                FindGame();
             }
             catch
             {
                 ReportEnterDebugFailure();
+                return;
             }
+
+            FindGame();
         }
 
         /************************************************************************/
@@ -91,9 +92,11 @@ namespace War3Trainer
 
         private void GetAllObject()
         {
-            // Get a new trainer
+            // Check paramters
             if (_currentGameContext == null)
                 return;
+
+            // Get a new trainer
             _mainTrainer = new GameTrainer(_currentGameContext);
 
             // Create function tree

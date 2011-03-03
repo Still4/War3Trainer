@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
-            this.ToolContainer = new System.Windows.Forms.ToolStripContainer();
-            this.ToolStripMain = new System.Windows.Forms.ToolStrip();
+            this.toolContainer = new System.Windows.Forms.ToolStripContainer();
+            this.toolStripMain = new System.Windows.Forms.ToolStrip();
             this.labGameScanState = new System.Windows.Forms.ToolStripLabel();
             this.cmdScanGame = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -52,10 +52,10 @@
             this.colOriginalValue = new System.Windows.Forms.ColumnHeader();
             this.colUnsavedValue = new System.Windows.Forms.ColumnHeader();
             this.txtInput = new System.Windows.Forms.TextBox();
-            this.ToolContainer.ContentPanel.SuspendLayout();
-            this.ToolContainer.TopToolStripPanel.SuspendLayout();
-            this.ToolContainer.SuspendLayout();
-            this.ToolStripMain.SuspendLayout();
+            this.toolContainer.ContentPanel.SuspendLayout();
+            this.toolContainer.TopToolStripPanel.SuspendLayout();
+            this.toolContainer.SuspendLayout();
+            this.toolStripMain.SuspendLayout();
             this.menuMain.SuspendLayout();
             this.splitMain.Panel1.SuspendLayout();
             this.splitMain.Panel2.SuspendLayout();
@@ -63,36 +63,36 @@
             this.viewData.SuspendLayout();
             this.SuspendLayout();
             // 
-            // ToolContainer
+            // toolContainer
             // 
             // 
-            // ToolContainer.ContentPanel
+            // toolContainer.ContentPanel
             // 
-            this.ToolContainer.ContentPanel.Controls.Add(this.ToolStripMain);
-            this.ToolContainer.ContentPanel.Size = new System.Drawing.Size(535, 27);
-            this.ToolContainer.Dock = System.Windows.Forms.DockStyle.Top;
-            this.ToolContainer.Location = new System.Drawing.Point(0, 0);
-            this.ToolContainer.Name = "ToolContainer";
-            this.ToolContainer.Size = new System.Drawing.Size(535, 51);
-            this.ToolContainer.TabIndex = 2;
-            this.ToolContainer.Text = "toolStripContainer1";
+            this.toolContainer.ContentPanel.Controls.Add(this.toolStripMain);
+            this.toolContainer.ContentPanel.Size = new System.Drawing.Size(535, 27);
+            this.toolContainer.Dock = System.Windows.Forms.DockStyle.Top;
+            this.toolContainer.Location = new System.Drawing.Point(0, 0);
+            this.toolContainer.Name = "toolContainer";
+            this.toolContainer.Size = new System.Drawing.Size(535, 51);
+            this.toolContainer.TabIndex = 0;
+            this.toolContainer.Text = "toolStripContainer1";
             // 
-            // ToolContainer.TopToolStripPanel
+            // toolContainer.TopToolStripPanel
             // 
-            this.ToolContainer.TopToolStripPanel.Controls.Add(this.menuMain);
+            this.toolContainer.TopToolStripPanel.Controls.Add(this.menuMain);
             // 
-            // ToolStripMain
+            // toolStripMain
             // 
-            this.ToolStripMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.labGameScanState,
             this.cmdScanGame,
             this.toolStripSeparator1});
-            this.ToolStripMain.Location = new System.Drawing.Point(0, 0);
-            this.ToolStripMain.Name = "ToolStripMain";
-            this.ToolStripMain.Padding = new System.Windows.Forms.Padding(3, 2, 0, 2);
-            this.ToolStripMain.Size = new System.Drawing.Size(535, 27);
-            this.ToolStripMain.TabIndex = 0;
-            this.ToolStripMain.Text = "toolStrip1";
+            this.toolStripMain.Location = new System.Drawing.Point(0, 0);
+            this.toolStripMain.Name = "toolStripMain";
+            this.toolStripMain.Padding = new System.Windows.Forms.Padding(3, 2, 0, 2);
+            this.toolStripMain.Size = new System.Drawing.Size(535, 27);
+            this.toolStripMain.TabIndex = 1;
+            this.toolStripMain.Text = "toolStrip1";
             // 
             // labGameScanState
             // 
@@ -127,7 +127,7 @@
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Size = new System.Drawing.Size(535, 24);
-            this.menuMain.TabIndex = 0;
+            this.menuMain.TabIndex = 2;
             this.menuMain.Text = "menuStrip1";
             // 
             // menuFile
@@ -181,7 +181,7 @@
             this.viewFunctions.Location = new System.Drawing.Point(0, 0);
             this.viewFunctions.Name = "viewFunctions";
             this.viewFunctions.Size = new System.Drawing.Size(165, 341);
-            this.viewFunctions.TabIndex = 0;
+            this.viewFunctions.TabIndex = 3;
             this.viewFunctions.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.viewFunctions_BeforeSelect);
             // 
             // cmdGetAllObjects
@@ -191,7 +191,7 @@
             this.cmdGetAllObjects.Margin = new System.Windows.Forms.Padding(3, 9, 3, 3);
             this.cmdGetAllObjects.Name = "cmdGetAllObjects";
             this.cmdGetAllObjects.Size = new System.Drawing.Size(75, 23);
-            this.cmdGetAllObjects.TabIndex = 1;
+            this.cmdGetAllObjects.TabIndex = 4;
             this.cmdGetAllObjects.Text = "刷新";
             this.cmdGetAllObjects.UseVisualStyleBackColor = true;
             this.cmdGetAllObjects.Click += new System.EventHandler(this.cmdGetAllObjects_Click);
@@ -203,7 +203,7 @@
             this.cmdModify.Margin = new System.Windows.Forms.Padding(3, 9, 3, 3);
             this.cmdModify.Name = "cmdModify";
             this.cmdModify.Size = new System.Drawing.Size(75, 23);
-            this.cmdModify.TabIndex = 2;
+            this.cmdModify.TabIndex = 5;
             this.cmdModify.Text = "修改";
             this.cmdModify.UseVisualStyleBackColor = true;
             this.cmdModify.Click += new System.EventHandler(this.cmdModify_Click);
@@ -216,7 +216,7 @@
             this.txtIntroduction.ReadOnly = true;
             this.txtIntroduction.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtIntroduction.Size = new System.Drawing.Size(139, 53);
-            this.txtIntroduction.TabIndex = 0;
+            this.txtIntroduction.TabIndex = 6;
             this.txtIntroduction.Text = resources.GetString("txtIntroduction.Text");
             // 
             // splitMain
@@ -239,7 +239,7 @@
             this.splitMain.Size = new System.Drawing.Size(515, 341);
             this.splitMain.SplitterDistance = 165;
             this.splitMain.SplitterWidth = 6;
-            this.splitMain.TabIndex = 0;
+            this.splitMain.TabIndex = 7;
             // 
             // lblEmpty
             // 
@@ -247,7 +247,7 @@
             this.lblEmpty.Location = new System.Drawing.Point(167, 14);
             this.lblEmpty.Name = "lblEmpty";
             this.lblEmpty.Size = new System.Drawing.Size(113, 36);
-            this.lblEmpty.TabIndex = 1;
+            this.lblEmpty.TabIndex = 8;
             this.lblEmpty.Text = "没有可修改的项目，\r\n请在左侧功能列表中\r\n选择一个修改项。";
             // 
             // viewData
@@ -264,7 +264,7 @@
             this.viewData.MultiSelect = false;
             this.viewData.Name = "viewData";
             this.viewData.Size = new System.Drawing.Size(302, 134);
-            this.viewData.TabIndex = 2;
+            this.viewData.TabIndex = 9;
             this.viewData.UseCompatibleStateImageBehavior = false;
             this.viewData.View = System.Windows.Forms.View.Details;
             this.viewData.Scrolling += new System.EventHandler(this.viewData_Scrolling);
@@ -295,7 +295,7 @@
             this.txtInput.MaxLength = 10;
             this.txtInput.Name = "txtInput";
             this.txtInput.Size = new System.Drawing.Size(100, 21);
-            this.txtInput.TabIndex = 0;
+            this.txtInput.TabIndex = 10;
             this.txtInput.Text = "数值在这里";
             this.txtInput.Visible = false;
             this.txtInput.Leave += new System.EventHandler(this.txtInput_Leave);
@@ -310,18 +310,18 @@
             this.Controls.Add(this.splitMain);
             this.Controls.Add(this.cmdModify);
             this.Controls.Add(this.cmdGetAllObjects);
-            this.Controls.Add(this.ToolContainer);
+            this.Controls.Add(this.toolContainer);
             this.Name = "FrmMain";
             this.Text = "魔兽3内存修改器 v9";
             this.Load += new System.EventHandler(this.FrmMain_Load);
-            this.ToolContainer.ContentPanel.ResumeLayout(false);
-            this.ToolContainer.ContentPanel.PerformLayout();
-            this.ToolContainer.TopToolStripPanel.ResumeLayout(false);
-            this.ToolContainer.TopToolStripPanel.PerformLayout();
-            this.ToolContainer.ResumeLayout(false);
-            this.ToolContainer.PerformLayout();
-            this.ToolStripMain.ResumeLayout(false);
-            this.ToolStripMain.PerformLayout();
+            this.toolContainer.ContentPanel.ResumeLayout(false);
+            this.toolContainer.ContentPanel.PerformLayout();
+            this.toolContainer.TopToolStripPanel.ResumeLayout(false);
+            this.toolContainer.TopToolStripPanel.PerformLayout();
+            this.toolContainer.ResumeLayout(false);
+            this.toolContainer.PerformLayout();
+            this.toolStripMain.ResumeLayout(false);
+            this.toolStripMain.PerformLayout();
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
             this.splitMain.Panel1.ResumeLayout(false);
@@ -336,13 +336,13 @@
 
         #endregion
 
-        private System.Windows.Forms.ToolStripContainer ToolContainer;
+        private System.Windows.Forms.ToolStripContainer toolContainer;
         private System.Windows.Forms.MenuStrip menuMain;
         private System.Windows.Forms.ToolStripMenuItem menuFile;
         private System.Windows.Forms.ToolStripMenuItem menuFileExit;
         private System.Windows.Forms.ToolStripMenuItem menuHelp;
         private System.Windows.Forms.ToolStripMenuItem menuHelpAbout;
-        private System.Windows.Forms.ToolStrip ToolStripMain;
+        private System.Windows.Forms.ToolStrip toolStripMain;
         private System.Windows.Forms.ToolStripLabel labGameScanState;
         private System.Windows.Forms.TreeView viewFunctions;
         private System.Windows.Forms.Button cmdGetAllObjects;

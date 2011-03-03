@@ -237,15 +237,15 @@ namespace WindowsApi
         {
             byte[] buffer = new byte[size];
             UIntPtr apiSize = (UIntPtr)size, apiBytesRead;
-            if (!NativeMethods.ReadProcessMemory(
+
+            // Note: Memory access error will be ignored
+            NativeMethods.ReadProcessMemory(
                 _processHandle,
                 baseAddress,
                 buffer,
                 apiSize,
-                out apiBytesRead))
-            {
-                throw new BadProcessIdException(_processId);
-            }
+                out apiBytesRead);
+
             bytesRead = (int)apiBytesRead;
             return buffer;
         }
@@ -254,15 +254,15 @@ namespace WindowsApi
         public void WriteBytes(byte[] buffer, IntPtr baseAddress, int size, out int bytesWriten)
         {
             UIntPtr apiSize = (UIntPtr)size, apiBytesWriten;
-            if (!NativeMethods.WriteProcessMemory(
+
+            // Note: Memory access error will be ignored
+            NativeMethods.WriteProcessMemory(
                 _processHandle,
                 baseAddress,
                 buffer,
                 apiSize,
-                out apiBytesWriten))
-            {
-                throw new BadProcessIdException(_processId);
-            }
+                out apiBytesWriten);
+
             bytesWriten = (int)apiBytesWriten;
         }
 
