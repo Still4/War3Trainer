@@ -117,7 +117,7 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 23);
             // 
-            // MenuMain
+            // menuMain
             // 
             this.menuMain.Dock = System.Windows.Forms.DockStyle.None;
             this.menuMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
@@ -125,51 +125,51 @@
             this.menuFile,
             this.menuHelp});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
-            this.menuMain.Name = "MenuMain";
+            this.menuMain.Name = "menuMain";
             this.menuMain.Size = new System.Drawing.Size(535, 24);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip1";
             // 
-            // MenuFile
+            // menuFile
             // 
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuDebug1,
             this.menuSplit1,
             this.menuFileExit});
-            this.menuFile.Name = "MenuFile";
+            this.menuFile.Name = "menuFile";
             this.menuFile.Size = new System.Drawing.Size(59, 20);
             this.menuFile.Text = "文件(&F)";
             // 
-            // MenuDebug1
+            // menuDebug1
             // 
-            this.menuDebug1.Name = "MenuDebug1";
+            this.menuDebug1.Name = "menuDebug1";
             this.menuDebug1.Size = new System.Drawing.Size(208, 22);
             this.menuDebug1.Text = "内部-ReadFromGameMemory";
             this.menuDebug1.Click += new System.EventHandler(this.menuDebug1_Click);
             // 
-            // MenuSplitor1
+            // menuSplit1
             // 
-            this.menuSplit1.Name = "MenuSplitor1";
+            this.menuSplit1.Name = "menuSplit1";
             this.menuSplit1.Size = new System.Drawing.Size(205, 6);
             // 
-            // MenuFileExit
+            // menuFileExit
             // 
-            this.menuFileExit.Name = "MenuFileExit";
+            this.menuFileExit.Name = "menuFileExit";
             this.menuFileExit.Size = new System.Drawing.Size(208, 22);
             this.menuFileExit.Text = "退出(&X)";
             this.menuFileExit.Click += new System.EventHandler(this.MenuFileExit_Click);
             // 
-            // MenuHelp
+            // menuHelp
             // 
             this.menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuHelpAbout});
-            this.menuHelp.Name = "MenuHelp";
+            this.menuHelp.Name = "menuHelp";
             this.menuHelp.Size = new System.Drawing.Size(59, 20);
             this.menuHelp.Text = "帮助(&H)";
             // 
-            // MenuHelpAbout
+            // menuHelpAbout
             // 
-            this.menuHelpAbout.Name = "MenuHelpAbout";
+            this.menuHelpAbout.Name = "menuHelpAbout";
             this.menuHelpAbout.Size = new System.Drawing.Size(148, 22);
             this.menuHelpAbout.Text = "关于修改器(&A)";
             this.menuHelpAbout.Click += new System.EventHandler(this.MenuHelpAbout_Click);
@@ -210,7 +210,6 @@
             // 
             // txtIntroduction
             // 
-            this.txtIntroduction.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtIntroduction.Location = new System.Drawing.Point(17, 14);
             this.txtIntroduction.Multiline = true;
             this.txtIntroduction.Name = "txtIntroduction";

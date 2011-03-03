@@ -138,10 +138,12 @@ namespace War3Trainer
 
         private void SelectFunction(TreeNode functionNode)
         {
+            if (functionNode == null)
+                return;
             ITrainerNode node = functionNode.Tag as ITrainerNode;
             if (node == null)
                 return;
-            
+
             // Show introduction page
             if (node.NodeType == TrainerNodeType.Introduction)
             {
@@ -339,6 +341,9 @@ namespace War3Trainer
 
                 // Refresh left
                 TreeNode selectedNode = viewFunctions.SelectedNode;
+                if (selectedNode == null)
+                    return;
+
                 ITrainerNode functionNode = selectedNode.Tag as ITrainerNode;
                 if (functionNode != null)
                     RefreshSelectedObject(functionNode);
