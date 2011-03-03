@@ -84,16 +84,30 @@
 9、攻击频率：[UnitAttributes + 1B0]	float
 源代码：6F0C64E0
 即：int __thiscall getHeroROF_NotSure(int *this, int a2, int a3, int a4)
+这是一个比值，对两种武器均适用。
 
-10-13、攻击相关：int
-参考(攻击频率/UnitAttributes)	0	1B0	
-攻击 - 基础			-110	 A0
-攻击 - 倍乘			-11C	 94
-攻击 - 骰子			-128	 88
-攻击 - 种类			-BC	 F4
+10、武器射程
+从UnitAttributes开始，参考：6F352CA3
+公式为[UnitAttributes + 258 + index * 8]，参考：6F0C61A5
+其中index是指武器的编号，取0和1
 
-14、移动速度：[“参数” + 70h] float 单位的移动(未叠加效果时)，
-        或者：[“参数” + 78h] float 当前的移动速度
+11、其它攻击相关：int
+地址为 UnitAttributes + 下面的偏移量
+
+攻击1 - 基础1		A0
+攻击1 - 基础2		AC
+攻击1 - 倍乘		94
+攻击1 - 骰子		88
+攻击1 - 种类		F4
+
+攻击2 - 基础1		A4
+攻击2 - 基础2		B0
+攻击2 - 倍乘		98
+攻击2 - 骰子		8C
+攻击2 - 种类		F8
+
+12、移动速度：[“参数” + 70h] float 当前的移动速度
+        或者：[“参数” + 78h] float 当前的移动速度的比值
 源代码：6F201190
 即：void __thiscall sub_6F201190(int this, int a2, int a3)
 
@@ -109,25 +123,20 @@
 源代码：6f2011a1: mov eax, [ecx+70]	ecx=07c50094
 （6）如果不相等，那么下一个I = 算法2([I + 24]
 
-15、防御：[ThisUnit + E0]	float
+13、防御：[ThisUnit + E0]	float
 源代码：6F353250
 6F3532A2: mov eax, dword ptr [ebx+e0]
 即：void __thiscall sub_6F353250(int this, int a2, int a3, int a4)
 
-16、防御类型：[ThisUnit + E4]	int
+14、防御类型：[ThisUnit + E4]	int
 
-17、坐标X：
+15、坐标X：
 [ThisUnit + 164]，参考：6F2776C4
 [上面+8]作为index，[上面+C]作为Refrence，用算法0，参考：6F464685
 [上面+78]，参考：6F38A52C
 [上面]为坐标X，参考：6f6de775
 
-18、[坐标Y] = [坐标X的地址 + 4]
-
-19、武器射程
-从UnitAttributes开始，参考：6F352CA3
-公式为[UnitAttributes + 258 + index * 8]，参考：6F0C61A5
-其中index是指武器的编号，取0和1
+16、[坐标Y] = [坐标X的地址 + 4]
 
 四、金钱的修改
 参考：6F407220，看最后一段

@@ -27,14 +27,14 @@ namespace War3Trainer
         : EventArgs
     {
         public TrainerNodeType NodeType { get; set; }
-        public int ParentNodeIndex { get; set; }
+        public int ParentNodeIndex      { get; set; }
 
-        public UInt32 pThisGame { get; set; }           // [6FAA4178]
-        public UInt32 pThisGameMemory { get; set; }     // [ThisGame + 0xC]
-        public UInt32 pThisUnit { get; set; }           // Unit ESI
-        public UInt32 pUnitAttributes { get; set; }     // [ThisUnit + 1E4]
-        public UInt32 pHeroAttributes { get; set; }     // [ThisUnit + 1EC]
-        public UInt32 pCurrentGoods { get; set; }       // [ThisUnit + 1F4]...
+        public UInt32 pThisGame         { get; set; }   // [6FAA4178]
+        public UInt32 pThisGameMemory   { get; set; }   // [ThisGame + 0xC]
+        public UInt32 pThisUnit         { get; set; }   // Unit ESI
+        public UInt32 pUnitAttributes   { get; set; }   // [ThisUnit + 1E4]
+        public UInt32 pHeroAttributes   { get; set; }   // [ThisUnit + 1EC]
+        public UInt32 pCurrentGoods     { get; set; }   // [ThisUnit + 1F4]...
 
         public NewChildrenEventArgs()
         {
@@ -43,14 +43,16 @@ namespace War3Trainer
         public NewChildrenEventArgs Clone()
         {
             NewChildrenEventArgs retObject = new NewChildrenEventArgs();
-            retObject.NodeType = this.NodeType;
+
+            retObject.NodeType        = this.NodeType;
             retObject.ParentNodeIndex = this.ParentNodeIndex;
-            retObject.pThisGame = this.pThisGame;
+            retObject.pThisGame       = this.pThisGame;
             retObject.pThisGameMemory = this.pThisGameMemory;
-            retObject.pThisUnit = this.pThisUnit;
+            retObject.pThisUnit       = this.pThisUnit;
             retObject.pUnitAttributes = this.pUnitAttributes;
             retObject.pHeroAttributes = this.pHeroAttributes;
-            retObject.pCurrentGoods = this.pCurrentGoods;
+            retObject.pCurrentGoods   = this.pCurrentGoods;
+
             return retObject;
         }
     }
@@ -75,12 +77,12 @@ namespace War3Trainer
     internal class NewAddressListEventArgs
         : EventArgs
     {
-        public int ParentNodeIndex;
-        public string Caption;
+        public int ParentNodeIndex { get; private set; }
+        public string Caption { get; private set; }
 
-        public UInt32 Address;
-        public AddressListValueType ValueType;
-        public int ValueScale;
+        public UInt32 Address { get; private set; }
+        public AddressListValueType ValueType { get; private set; }
+        public int ValueScale { get; private set; }
 
         public NewAddressListEventArgs(
             int parentNodeIndex,
@@ -109,25 +111,22 @@ namespace War3Trainer
 
     internal interface IAddressNode
     {
-        int ParentIndex { get; }
+        int                  ParentIndex { get; }
 
-        string Caption { get; }
-        UInt32 Address { get; }
-        AddressListValueType ValueType { get; }
-        int ValueScale { get; }
+        string               Caption     { get; }
+        UInt32               Address     { get; }
+        AddressListValueType ValueType   { get; }
+        int                  ValueScale  { get; }
     }
 
     #endregion
 
     #region Basic nodes
-    
-    internal delegate void NewChildrenEventHandler(object sender, NewChildrenEventArgs e);
-    internal delegate void NewAddressListEventHandler(object sender, NewAddressListEventArgs e);
 
     internal class TrainerNode
     {
-        public NewChildrenEventHandler      NewChildren;
-        public NewAddressListEventHandler   NewAddress;
+        public event EventHandler<NewChildrenEventArgs> NewChildren;
+        public event EventHandler<NewAddressListEventArgs> NewAddress;
 
         public virtual void CreateChildren()
         {
@@ -146,10 +145,10 @@ namespace War3Trainer
             }
         }
 
-        protected void CreateAddress(NewAddressListEventArgs AddressListArgs)
+        protected void CreateAddress(NewAddressListEventArgs addressListArgs)
         {
             if (NewAddress != null)
-                NewAddress(this, AddressListArgs);
+                NewAddress(this, addressListArgs);
         }
 
         protected int _nodeIndex;
@@ -201,85 +200,22 @@ namespace War3Trainer
 
         #region Enumerator & Index
 
-        // Enumerator - Function
-        internal class FunctionCollection
-            : IEnumerable<ITrainerNode>
+        public IEnumerable<ITrainerNode> GetFunctionList()
         {
-            private List<TrainerNode> _allTrainers;
-
-            public FunctionCollection(List<TrainerNode> allTrainers)
+            lock (_allTrainers)
             {
-                _allTrainers = allTrainers;
-            }
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-                lock (_allTrainers)
-                {
-                    foreach (TrainerNode i in _allTrainers)
-                        yield return i as ITrainerNode;
-                }
-            }
-
-            IEnumerator<ITrainerNode> IEnumerable<ITrainerNode>.GetEnumerator()
-            {
-                lock (_allTrainers)
-                {
-                    foreach (TrainerNode i in _allTrainers)
-                        yield return i as ITrainerNode;
-                }
+                foreach (var i in _allTrainers)
+                    yield return i as ITrainerNode;
             }
         }
 
-        public FunctionCollection GetFunctionList()
+        public IEnumerable<IAddressNode> GetAddressList()
         {
-            return new FunctionCollection(_allTrainers);
-        }
-
-        // Enumerator - Addresses
-        internal class AddressCollection
-            : IEnumerable<IAddressNode>
-        {
-            private List<NodeAddressList> _AllAddress;
-            public AddressCollection(List<NodeAddressList> AllAddress)
+            lock (_allAdress)
             {
-                _AllAddress = AllAddress;
+                foreach (var i in _allAdress)
+                    yield return i;
             }
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-                lock (_AllAddress)
-                {
-                    foreach (IAddressNode i in _AllAddress)
-                        yield return i;
-                }
-            }
-
-            IEnumerator<IAddressNode> IEnumerable<IAddressNode>.GetEnumerator()
-            {
-                lock (_AllAddress)
-                {
-                    foreach (IAddressNode i in _AllAddress)
-                        yield return i as IAddressNode;
-                }
-            }
-        }
-
-        public AddressCollection GetAddressList()
-        {
-            return new AddressCollection(_allAdress);
-        }
-
-        // Index - Function
-        public ITrainerNode GetFunction(int index)
-        {
-            return _allTrainers[index] as ITrainerNode;
-        }
-
-        // Index - Address
-        public IAddressNode GetAddress(int index)
-        {
-            return _allAdress[index];
         }
 
         #endregion
@@ -292,23 +228,23 @@ namespace War3Trainer
             // Get trainers in 1st layer
             NewChildrenEventArgs args = new NewChildrenEventArgs();
             args.NodeType = TrainerNodeType.Root;
-            NewChildrenEventHandler(this, args);
+            NewChildrenEventReaction(this, args);
 
             // Get all other trainers
             int Index = 0;
             int Count = 1;
             while (Index < Count)
             {
-                _allTrainers[Index].CreateChildren();
                 lock (_allTrainers)
                 {
+                    _allTrainers[Index].CreateChildren();
                     Index++;
                     Count = _allTrainers.Count;
                 }
             }
         }
 
-        void NewChildrenEventHandler(object sender, NewChildrenEventArgs e)
+        private void NewChildrenEventReaction(object sender, NewChildrenEventArgs e)
         {
             lock (_allTrainers)
             {
@@ -349,19 +285,20 @@ namespace War3Trainer
                         newNode = new NodeOneGoods(newNodeIndex, _gameContext, e);
                         break;
                     default:
-                        throw new System.ArgumentException();
+                        throw new System.ArgumentException("e.NodeType");
                 }
-                newNode.NewChildren += NewChildrenEventHandler;
-                newNode.NewAddress += NewAddressEventHandler;
+                newNode.NewChildren += NewChildrenEventReaction;
+                newNode.NewAddress += NewAddressEventReaction;
                 _allTrainers.Add(newNode);
             }
         }
 
-        private void NewAddressEventHandler(object sender, NewAddressListEventArgs e)
+        private void NewAddressEventReaction(object sender, NewAddressListEventArgs e)
         {
-            _allAdress.Add(
-                new NodeAddressList(e)
-            );
+            lock (_allAdress)
+            {
+                _allAdress.Add(new NodeAddressList(e));
+            }
         }
     }
 
@@ -551,7 +488,7 @@ namespace War3Trainer
                 return mem.ReadChar4((IntPtr)unchecked(_newChildrenArgs.pThisUnit + 0x30));
             }
         }
-                
+
         public override void CreateChildren()
         {
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_gameContext.ProcessId))
@@ -592,6 +529,10 @@ namespace War3Trainer
                     "HP - 最大",
                     tmpAddress1,
                     AddressListValueType.Float));
+                CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                    "HP - 回复率",
+                    unchecked(_newChildrenArgs.pThisUnit + 0xB0),
+                    AddressListValueType.Float));
 
                 tmpValue1 = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.pThisUnit + 0x98 + 0x28));
                 tmpAddress1 = War3Common.ReadFromGameMemory(
@@ -606,7 +547,11 @@ namespace War3Trainer
                     "MP - 最大",
                     tmpAddress1,
                     AddressListValueType.Float));
-
+                CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                   "MP - 回复率",
+                   unchecked(_newChildrenArgs.pThisUnit + 0xD4),
+                   AddressListValueType.Float));
+                
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                     "盔甲 - 数量",
                     unchecked(_newChildrenArgs.pThisUnit + 0xE0),
@@ -674,32 +619,110 @@ namespace War3Trainer
         public override void CreateChildren()
         {
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
-                "攻击 - 频率",
+                "攻击频率比",
                 unchecked(_newChildrenArgs.pUnitAttributes + 0x1B0),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
-                "攻击 - 基础",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xA0),
+                "默认攻击范围",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x244),
+                AddressListValueType.Float));
+            
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击1 - 倍乘",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x88 + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
-                "攻击 - 骰子",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x94),
+                "攻击1 - 骰子",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x94 + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
-                "攻击 - 倍乘",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x88),
+                "攻击1 - 基础1",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xA0 + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
-                "攻击 - 种类",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xF4),
+                "攻击1 - 基础2",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xAC + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
-                "攻击 - 范围1",
+                "攻击1 - 丢失因子",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xBC + 0 * 16),
+                AddressListValueType.Float));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击1 - 攻击音效",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xE8 + 0 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击1 - 种类",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xF4 + 0 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击1 - 最大目标数",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x100 + 0 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击1 - 间隔",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x158 + 0 * 8),
+                AddressListValueType.Float));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击1 - 首次延时",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x16C + 0 * 16),
+                AddressListValueType.Float));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击1 - 范围",
                 unchecked(_newChildrenArgs.pUnitAttributes + 0x258 + 0 * 8),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
-                "攻击 - 范围2",
+                "攻击1 - 范围缓冲",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x26C + 0 * 8),
+                AddressListValueType.Float));
+            
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 倍乘",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x88 + 1 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 骰子",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x94 + 1 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 基础1",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xA0 + 1 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 基础2",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xAC + 1 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 丢失因子",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xBC + 1 * 16),
+                AddressListValueType.Float));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 攻击音效",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xE8 + 1 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 种类",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0xF4 + 1 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 最大目标数",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x100 + 1 * 4),
+                AddressListValueType.Integer));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 间隔",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x158 + 1 * 8),
+                AddressListValueType.Float));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 首次延时",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x16C + 1 * 16),
+                AddressListValueType.Float));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 范围",
                 unchecked(_newChildrenArgs.pUnitAttributes + 0x258 + 1 * 8),
+                AddressListValueType.Float));
+            CreateAddress(new NewAddressListEventArgs(_nodeIndex,
+                "攻击2 - 范围缓冲",
+                unchecked(_newChildrenArgs.pUnitAttributes + 0x26C + 1 * 8),
                 AddressListValueType.Float));
         }
     }

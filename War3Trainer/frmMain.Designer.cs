@@ -34,13 +34,13 @@
             this.labGameScanState = new System.Windows.Forms.ToolStripLabel();
             this.cmdScanGame = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.MenuMain = new System.Windows.Forms.MenuStrip();
-            this.MenuFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuDebug1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuSplitor1 = new System.Windows.Forms.ToolStripSeparator();
-            this.MenuFileExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuHelp = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuMain = new System.Windows.Forms.MenuStrip();
+            this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuDebug1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSplit1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuFileExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.viewFunctions = new System.Windows.Forms.TreeView();
             this.cmdGetAllObjects = new System.Windows.Forms.Button();
             this.cmdModify = new System.Windows.Forms.Button();
@@ -56,7 +56,7 @@
             this.ToolContainer.TopToolStripPanel.SuspendLayout();
             this.ToolContainer.SuspendLayout();
             this.ToolStripMain.SuspendLayout();
-            this.MenuMain.SuspendLayout();
+            this.menuMain.SuspendLayout();
             this.splitMain.Panel1.SuspendLayout();
             this.splitMain.Panel2.SuspendLayout();
             this.splitMain.SuspendLayout();
@@ -79,7 +79,7 @@
             // 
             // ToolContainer.TopToolStripPanel
             // 
-            this.ToolContainer.TopToolStripPanel.Controls.Add(this.MenuMain);
+            this.ToolContainer.TopToolStripPanel.Controls.Add(this.menuMain);
             // 
             // ToolStripMain
             // 
@@ -119,60 +119,60 @@
             // 
             // MenuMain
             // 
-            this.MenuMain.Dock = System.Windows.Forms.DockStyle.None;
-            this.MenuMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
-            this.MenuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MenuFile,
-            this.MenuHelp});
-            this.MenuMain.Location = new System.Drawing.Point(0, 0);
-            this.MenuMain.Name = "MenuMain";
-            this.MenuMain.Size = new System.Drawing.Size(535, 24);
-            this.MenuMain.TabIndex = 0;
-            this.MenuMain.Text = "menuStrip1";
+            this.menuMain.Dock = System.Windows.Forms.DockStyle.None;
+            this.menuMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
+            this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuFile,
+            this.menuHelp});
+            this.menuMain.Location = new System.Drawing.Point(0, 0);
+            this.menuMain.Name = "MenuMain";
+            this.menuMain.Size = new System.Drawing.Size(535, 24);
+            this.menuMain.TabIndex = 0;
+            this.menuMain.Text = "menuStrip1";
             // 
             // MenuFile
             // 
-            this.MenuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MenuDebug1,
-            this.MenuSplitor1,
-            this.MenuFileExit});
-            this.MenuFile.Name = "MenuFile";
-            this.MenuFile.Size = new System.Drawing.Size(59, 20);
-            this.MenuFile.Text = "文件(&F)";
+            this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuDebug1,
+            this.menuSplit1,
+            this.menuFileExit});
+            this.menuFile.Name = "MenuFile";
+            this.menuFile.Size = new System.Drawing.Size(59, 20);
+            this.menuFile.Text = "文件(&F)";
             // 
             // MenuDebug1
             // 
-            this.MenuDebug1.Name = "MenuDebug1";
-            this.MenuDebug1.Size = new System.Drawing.Size(208, 22);
-            this.MenuDebug1.Text = "内部-ReadFromGameMemory";
-            this.MenuDebug1.Click += new System.EventHandler(this.MenuDebug1_Click);
+            this.menuDebug1.Name = "MenuDebug1";
+            this.menuDebug1.Size = new System.Drawing.Size(208, 22);
+            this.menuDebug1.Text = "内部-ReadFromGameMemory";
+            this.menuDebug1.Click += new System.EventHandler(this.menuDebug1_Click);
             // 
             // MenuSplitor1
             // 
-            this.MenuSplitor1.Name = "MenuSplitor1";
-            this.MenuSplitor1.Size = new System.Drawing.Size(205, 6);
+            this.menuSplit1.Name = "MenuSplitor1";
+            this.menuSplit1.Size = new System.Drawing.Size(205, 6);
             // 
             // MenuFileExit
             // 
-            this.MenuFileExit.Name = "MenuFileExit";
-            this.MenuFileExit.Size = new System.Drawing.Size(208, 22);
-            this.MenuFileExit.Text = "退出(&X)";
-            this.MenuFileExit.Click += new System.EventHandler(this.MenuFileExit_Click);
+            this.menuFileExit.Name = "MenuFileExit";
+            this.menuFileExit.Size = new System.Drawing.Size(208, 22);
+            this.menuFileExit.Text = "退出(&X)";
+            this.menuFileExit.Click += new System.EventHandler(this.MenuFileExit_Click);
             // 
             // MenuHelp
             // 
-            this.MenuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MenuHelpAbout});
-            this.MenuHelp.Name = "MenuHelp";
-            this.MenuHelp.Size = new System.Drawing.Size(59, 20);
-            this.MenuHelp.Text = "帮助(&H)";
+            this.menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuHelpAbout});
+            this.menuHelp.Name = "MenuHelp";
+            this.menuHelp.Size = new System.Drawing.Size(59, 20);
+            this.menuHelp.Text = "帮助(&H)";
             // 
             // MenuHelpAbout
             // 
-            this.MenuHelpAbout.Name = "MenuHelpAbout";
-            this.MenuHelpAbout.Size = new System.Drawing.Size(148, 22);
-            this.MenuHelpAbout.Text = "关于修改器(&A)";
-            this.MenuHelpAbout.Click += new System.EventHandler(this.MenuHelpAbout_Click);
+            this.menuHelpAbout.Name = "MenuHelpAbout";
+            this.menuHelpAbout.Size = new System.Drawing.Size(148, 22);
+            this.menuHelpAbout.Text = "关于修改器(&A)";
+            this.menuHelpAbout.Click += new System.EventHandler(this.MenuHelpAbout_Click);
             // 
             // viewFunctions
             // 
@@ -276,7 +276,7 @@
             // colName
             // 
             this.colName.Text = "修改项目名称";
-            this.colName.Width = 120;
+            this.colName.Width = 130;
             // 
             // colOriginalValue
             // 
@@ -314,6 +314,7 @@
             this.Controls.Add(this.ToolContainer);
             this.Name = "FrmMain";
             this.Text = "魔兽3内存修改器 v9";
+            this.Load += new System.EventHandler(this.FrmMain_Load);
             this.ToolContainer.ContentPanel.ResumeLayout(false);
             this.ToolContainer.ContentPanel.PerformLayout();
             this.ToolContainer.TopToolStripPanel.ResumeLayout(false);
@@ -322,8 +323,8 @@
             this.ToolContainer.PerformLayout();
             this.ToolStripMain.ResumeLayout(false);
             this.ToolStripMain.PerformLayout();
-            this.MenuMain.ResumeLayout(false);
-            this.MenuMain.PerformLayout();
+            this.menuMain.ResumeLayout(false);
+            this.menuMain.PerformLayout();
             this.splitMain.Panel1.ResumeLayout(false);
             this.splitMain.Panel2.ResumeLayout(false);
             this.splitMain.Panel2.PerformLayout();
@@ -337,11 +338,11 @@
         #endregion
 
         private System.Windows.Forms.ToolStripContainer ToolContainer;
-        private System.Windows.Forms.MenuStrip MenuMain;
-        private System.Windows.Forms.ToolStripMenuItem MenuFile;
-        private System.Windows.Forms.ToolStripMenuItem MenuFileExit;
-        private System.Windows.Forms.ToolStripMenuItem MenuHelp;
-        private System.Windows.Forms.ToolStripMenuItem MenuHelpAbout;
+        private System.Windows.Forms.MenuStrip menuMain;
+        private System.Windows.Forms.ToolStripMenuItem menuFile;
+        private System.Windows.Forms.ToolStripMenuItem menuFileExit;
+        private System.Windows.Forms.ToolStripMenuItem menuHelp;
+        private System.Windows.Forms.ToolStripMenuItem menuHelpAbout;
         private System.Windows.Forms.ToolStrip ToolStripMain;
         private System.Windows.Forms.ToolStripLabel labGameScanState;
         private System.Windows.Forms.TreeView viewFunctions;
@@ -355,8 +356,8 @@
         private System.Windows.Forms.ColumnHeader colUnsavedValue;
         private System.Windows.Forms.TextBox txtIntroduction;
         private System.Windows.Forms.TextBox txtInput;
-        private System.Windows.Forms.ToolStripMenuItem MenuDebug1;
-        private System.Windows.Forms.ToolStripSeparator MenuSplitor1;
+        private System.Windows.Forms.ToolStripMenuItem menuDebug1;
+        private System.Windows.Forms.ToolStripSeparator menuSplit1;
         private System.Windows.Forms.SplitContainer splitMain;
         private System.Windows.Forms.Label lblEmpty;
     }

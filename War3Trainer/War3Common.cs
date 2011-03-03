@@ -31,6 +31,7 @@ namespace War3Trainer
         }
 
         // Game memory extract algorithm 0 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "gameContext")]
         public static UInt32 ReadFromGameMemory(
             WindowsApi.ProcessMemory mem, GameContext gameContext, NewChildrenEventArgs gameAddress,
             Int32 index)

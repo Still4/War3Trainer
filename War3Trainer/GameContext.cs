@@ -3,36 +3,115 @@ using System.Diagnostics;   // Process, FileVersionInfo
 
 namespace War3Trainer
 {
-    // Exceptions
-    public class UnkonwnGameVersionExpection
-        : ApplicationException
-    {
-        public readonly int ProcessId;
-        public readonly string FileVersion;
+    /************************************************************************/
+    /* Exceptions                                                           */
+    /************************************************************************/
+    #region Exception
 
-        public UnkonwnGameVersionExpection(
-            int processId,
-            string fileVersion)
+    [Serializable]
+    public class UnkonwnGameVersionExpection
+        : Exception, System.Runtime.Serialization.ISerializable
+    {
+        public int ProcessId      { get; private set; }
+        public string GameVersion { get; private set; }
+
+        public UnkonwnGameVersionExpection()
+            : base("Game version can not be recognized.")
+        {
+            
+        }
+
+        public UnkonwnGameVersionExpection(string message)
+            : base(message)
+        {
+            
+        }
+        
+        public UnkonwnGameVersionExpection(string message, Exception innerException)
+            : base(message, innerException)
+        {
+            
+        }
+
+        public UnkonwnGameVersionExpection(int processId, string gameVersion)
         {
             ProcessId = processId;
-            FileVersion = fileVersion;
+            GameVersion = gameVersion;
+        }
+
+        public UnkonwnGameVersionExpection(string message, int processId, string gameVersion) 
+            : base(message)
+        {
+            ProcessId = processId;
+            GameVersion = gameVersion;
+        }
+
+        public UnkonwnGameVersionExpection(string message, int processId, string gameVersion, Exception innerException)
+            : base(message, innerException)
+        {
+            ProcessId = processId;
+            GameVersion = gameVersion;
+        }
+
+        protected UnkonwnGameVersionExpection(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+            ProcessId = info.GetInt32("ProcessId");
+            GameVersion = info.GetString("GameVersion");
+        }
+
+        [System.Security.Permissions.SecurityPermission(System.Security.Permissions.SecurityAction.LinkDemand, Flags = System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter)]
+        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException("info");
+            }
+            base.GetObjectData(info, context);
+            info.AddValue("ProcessId", ProcessId, typeof(int));
+            info.AddValue("GameVersion", GameVersion, typeof(string));
+        }
+
+        public override string Message
+        {
+            get
+            {
+                string message = base.Message;
+                if (ProcessId != 0)
+                {
+                    return message
+                        + string.Format(
+                            System.Globalization.CultureInfo.CurrentCulture,
+                            "{0}ProcessId = {1}{0}GameVersion = {2}",
+                            Environment.NewLine,
+                            ProcessId,
+                            GameVersion);
+                }
+                return message;
+            }
         }
     }
 
-    // This is the context of War3Trainer
+    #endregion
+
+    /************************************************************************/
+    /* Context of War3Trainer                                               */
+    /************************************************************************/
     class GameContext
     {
-        public readonly int ProcessId;      // PID
-        public readonly string ProcessVersion;
+        public int ProcessId                      { get; private set; }
+        public string ProcessVersion              { get; private set; }
 
-        public readonly UInt32 War3AddressThisGame;
-        public readonly UInt32 War3AddressSelectedUnitList;
-        public readonly UInt32 War3AddressMoveSpeed;
+        public UInt32 War3AddressThisGame         { get; private set; }
+        public UInt32 War3AddressSelectedUnitList { get; private set; }
+        public UInt32 War3AddressMoveSpeed        { get; private set; }
 
-        public readonly UInt32 War3OffsetUnitAttributes;
-        public readonly UInt32 War3OffsetHeroAttributes;
-        public readonly UInt32 War3OffsetGoodsList;
-        public readonly UInt32 War3OffsetMoveSpeed;
+        public UInt32 War3OffsetUnitAttributes    { get; private set; }
+        public UInt32 War3OffsetHeroAttributes    { get; private set; }
+        public UInt32 War3OffsetGoodsList         { get; private set; }
+        public UInt32 War3OffsetMoveSpeed         { get; private set; }
+
+        private uint _moduleAddress;
 
         // Get a context if the game is running and recognized.
         // Returns null if not running.
@@ -47,10 +126,23 @@ namespace War3Trainer
             return null;
         }
 
-        // Unknown game version will cause ctor() failure
         public GameContext(Process gameProcess, string moduleName)
         {
             // Get PID
+            GetProcessInfo(gameProcess);
+
+            // Find module
+            GetModuleInfo(gameProcess, moduleName);
+
+            // Decide addresses according to version
+            GetGameAddress();
+
+            // Decide offsets according to version
+            GetGameOffset();
+        }
+
+        private void GetProcessInfo(Process gameProcess)
+        {
             try
             {
                 this.ProcessId = gameProcess.Id;
@@ -59,8 +151,10 @@ namespace War3Trainer
             {
                 throw new WindowsApi.BadProcessIdException(0);
             }
+        }
 
-            // Find module
+        private void GetModuleInfo(Process gameProcess, string moduleName)
+        {
             ProcessModule mainModule = null;
             foreach (ProcessModule module in gameProcess.Modules)
             {
@@ -86,56 +180,60 @@ namespace War3Trainer
             }
 
             // Base address of module
-            uint baseAddress = (uint)mainModule.BaseAddress;
+            _moduleAddress = (uint)mainModule.BaseAddress;
+        }
 
-            // Decide addresses according to version
+        private void GetGameAddress()
+        {
             switch (ProcessVersion)
             {
                 case "1.20.4.6074":
-                    War3AddressThisGame         = baseAddress + 0x87C744;
-                    War3AddressSelectedUnitList = baseAddress + 0x8722BC;
-                    War3AddressMoveSpeed        = baseAddress + 0x55BDF0;
+                    War3AddressThisGame         = _moduleAddress + 0x87C744;
+                    War3AddressSelectedUnitList = _moduleAddress + 0x8722BC;
+                    War3AddressMoveSpeed        = _moduleAddress + 0x55BDF0;
                     break;
                 case "1.21.0.6263":
-                    War3AddressThisGame         = baseAddress + 0x87D7BC;
-                    War3AddressSelectedUnitList = baseAddress + 0x873334;
-                    War3AddressMoveSpeed        = baseAddress + 0x55FE80;
+                    War3AddressThisGame         = _moduleAddress + 0x87D7BC;
+                    War3AddressSelectedUnitList = _moduleAddress + 0x873334;
+                    War3AddressMoveSpeed        = _moduleAddress + 0x55FE80;
                     break;
                 case "1.21.1.6300":
-                    War3AddressThisGame         = baseAddress + 0x87D7BC;
-                    War3AddressSelectedUnitList = baseAddress + 0x873334;
-                    War3AddressMoveSpeed        = baseAddress + 0x55fEA0;
+                    War3AddressThisGame         = _moduleAddress + 0x87D7BC;
+                    War3AddressSelectedUnitList = _moduleAddress + 0x873334;
+                    War3AddressMoveSpeed        = _moduleAddress + 0x55fEA0;
                     break;
                 case "1.22.0.6328":
-                    War3AddressThisGame         = baseAddress + 0xAA4178;
-                    War3AddressSelectedUnitList = baseAddress + 0xAA2FFC;
-                    War3AddressMoveSpeed        = baseAddress + 0x201190;
+                    War3AddressThisGame         = _moduleAddress + 0xAA4178;
+                    War3AddressSelectedUnitList = _moduleAddress + 0xAA2FFC;
+                    War3AddressMoveSpeed        = _moduleAddress + 0x201190;
                     break;
                 case "1.23.0.6352":
-                    War3AddressThisGame         = baseAddress + 0xABCFC8;
-                    War3AddressSelectedUnitList = baseAddress + 0xABBE4C;
-                    War3AddressMoveSpeed        = baseAddress + 0x2026D0;
+                    War3AddressThisGame         = _moduleAddress + 0xABCFC8;
+                    War3AddressSelectedUnitList = _moduleAddress + 0xABBE4C;
+                    War3AddressMoveSpeed        = _moduleAddress + 0x2026D0;
                     break;
                 case "1.24.0.6372":
                 case "1.24.1.6374":
                 case "1.24.2.6378":
                 case "1.24.3.6384":
-                    War3AddressThisGame         = baseAddress + 0xACE5E0;
-                    War3AddressSelectedUnitList = baseAddress + 0xACD44C;
-                    War3AddressMoveSpeed        = baseAddress + 0x202780;
+                    War3AddressThisGame         = _moduleAddress + 0xACE5E0;
+                    War3AddressSelectedUnitList = _moduleAddress + 0xACD44C;
+                    War3AddressMoveSpeed        = _moduleAddress + 0x202780;
                     break;
                 case "1.24.4.6387":
-                    War3AddressThisGame         = baseAddress + 0xACE5E0;
-                    War3AddressSelectedUnitList = baseAddress + 0xACD44C;
-                    War3AddressMoveSpeed        = baseAddress + 0x2027E0;
+                    War3AddressThisGame         = _moduleAddress + 0xACE5E0;
+                    War3AddressSelectedUnitList = _moduleAddress + 0xACD44C;
+                    War3AddressMoveSpeed        = _moduleAddress + 0x2027E0;
                     break;
                 default:
                     throw new UnkonwnGameVersionExpection(
                         this.ProcessId,
                         ProcessVersion);
             }
+        }
 
-            // Decide offsets according to version
+        private void GetGameOffset()
+        {
             switch (ProcessVersion)
             {
                 case "1.20.4.6074":

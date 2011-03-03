@@ -12,19 +12,21 @@ namespace War3Trainer
         public FrmMain()
         {
             InitializeComponent();
+            txtIntroduction.Select(0, 0);     // Cancle select all in introduction box
+            SetRightGrid(RightFunction.Introduction);
+        }
 
+        private void FrmMain_Load(object sender, EventArgs e)
+        {
             try
             {
                 System.Diagnostics.Process.EnterDebugMode();
+                FindGame();
             }
-            catch (Exception ex)
+            catch
             {
-                this.labGameScanState.Text = ex.Message + "请以管理员身份运行";
+                ReportEnterDebugFailure();
             }
-
-            FindGame();
-            txtIntroduction.Select(0, 0);     // Cancle select all in introduction box
-            SetRightGrid(RightFunction.Introduction);
         }
 
         /************************************************************************/
@@ -39,10 +41,7 @@ namespace War3Trainer
                 if (_currentGameContext != null)
                 {
                     // Game online
-                    labGameScanState.Text = "检测到游戏（"
-                        + _currentGameContext.ProcessId.ToString()
-                        + "），游戏版本 "
-                        + _currentGameContext.ProcessVersion;
+                    ReportVersionOk(_currentGameContext.ProcessId, _currentGameContext.ProcessVersion);
 
                     // Get a new trainer
                     GetAllObject();
@@ -52,29 +51,25 @@ namespace War3Trainer
                 else
                 {
                     // Game offline
-                    labGameScanState.Text = "游戏未运行，运行游戏后单击“查找游戏”";
+                    ReportNoGameFoundFailure();
                 }
             }
-            catch (UnkonwnGameVersionExpection e)
+            catch (UnkonwnGameVersionExpection ex)
             {
                 // Unknown game version
                 _currentGameContext = null;
-                labGameScanState.Text = "检测到游戏（"
-                    + e.ProcessId.ToString()
-                    + "），但版本（"
-                    + e.FileVersion
-                    + "）不被支持";
+                ReportVersionFailure(ex.ProcessId, ex.GameVersion);
             }
-            catch (WindowsApi.BadProcessIdException exception)
+            catch (WindowsApi.BadProcessIdException ex)
             {
                 this._currentGameContext = null;
-                this.labGameScanState.Text = "错误的进程Id：" + exception.ProcessId.ToString();
+                ReportProcessIdFailure(ex.ProcessId);
             }
-            catch
+            catch (System.Exception ex)
             {
                 // Why here?
                 _currentGameContext = null;
-                labGameScanState.Text = "检测游戏版本时发生严重错误，请重试上一次的操作";
+                ReportUnknownFailure(ex.Message);
             }
 
             // Enable buttons
@@ -103,59 +98,59 @@ namespace War3Trainer
 
             // Create function tree
             viewFunctions.Nodes.Clear();
-            foreach (ITrainerNode CurrentFunction in _mainTrainer.GetFunctionList())
+            foreach (ITrainerNode currentFunction in _mainTrainer.GetFunctionList())
             {
-                TreeNode[] ParentNodes = viewFunctions.Nodes.Find(CurrentFunction.ParentIndex.ToString(), true);
-                TreeNodeCollection ParentTree;
-                if (ParentNodes.Length < 1)
-                    ParentTree = viewFunctions.Nodes;
+                TreeNode[] parentNodes = viewFunctions.Nodes.Find(currentFunction.ParentIndex.ToString(), true);
+                TreeNodeCollection parentTree;
+                if (parentNodes.Length < 1)
+                    parentTree = viewFunctions.Nodes;
                 else
-                    ParentTree = ParentNodes[0].Nodes;
+                    parentTree = parentNodes[0].Nodes;
 
-                ParentTree.Add(
-                    CurrentFunction.NodeIndex.ToString(),
-                    CurrentFunction.NodeTypeName)
-                    .Tag = CurrentFunction;
+                parentTree.Add(
+                    currentFunction.NodeIndex.ToString(),
+                    currentFunction.NodeTypeName)
+                    .Tag = currentFunction;
             }
             viewFunctions.ExpandAll();
 
             // Switch to page 1
-            TreeNode[] IntroductionNodes = viewFunctions.Nodes.Find("1", true);
-            if (IntroductionNodes.Length > 0)
+            TreeNode[] introductionNodes = viewFunctions.Nodes.Find("1", true);
+            if (introductionNodes.Length > 0)
             {
-                viewFunctions.SelectedNode = IntroductionNodes[0];
-                SelectAFunction(IntroductionNodes[0]);
+                viewFunctions.SelectedNode = introductionNodes[0];
+                SelectFunction(introductionNodes[0]);
             }
         }
 
         // Re-query specific tree-node by FunctionListNode
-        private void RefreshSelectedObject(ITrainerNode CurrentFunction)
+        private void RefreshSelectedObject(ITrainerNode currentFunction)
         {
-            TreeNode[] CurrentNodes = viewFunctions.Nodes.Find(CurrentFunction.NodeIndex.ToString(), true);
-            TreeNode CurrentTree;
-            if (CurrentNodes.Length < 1)
+            TreeNode[] currentNodes = viewFunctions.Nodes.Find(currentFunction.NodeIndex.ToString(), true);
+            TreeNode currentTree;
+            if (currentNodes.Length < 1)
                 return;
             else
-                CurrentTree = CurrentNodes[0];
+                currentTree = currentNodes[0];
 
-            CurrentTree.Text = CurrentFunction.NodeTypeName;
+            currentTree.Text = currentFunction.NodeTypeName;
         }
 
-        private void SelectAFunction(TreeNode FunctionNode)
+        private void SelectFunction(TreeNode functionNode)
         {
-            ITrainerNode Node = FunctionNode.Tag as ITrainerNode;
-            if (Node == null)
+            ITrainerNode node = functionNode.Tag as ITrainerNode;
+            if (node == null)
                 return;
             
             // Show introduction page
-            if (Node.NodeType == TrainerNodeType.Introduction)
+            if (node.NodeType == TrainerNodeType.Introduction)
             {
                 SetRightGrid(RightFunction.Introduction);
             }
             else
             {
                 // Fill address list
-                FillAddressList(Node.NodeIndex);
+                FillAddressList(node.NodeIndex);
                 
                 // Show address list
                 if (viewData.Items.Count > 0)
@@ -187,31 +182,31 @@ namespace War3Trainer
             // To get memory content
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_currentGameContext.ProcessId))
             {
-                foreach (ListViewItem CurrentItem in viewData.Items)
+                foreach (ListViewItem currentItem in viewData.Items)
                 {
-                    IAddressNode AddressLine = CurrentItem.Tag as IAddressNode;
-                    if (AddressLine == null)
+                    IAddressNode addressLine = currentItem.Tag as IAddressNode;
+                    if (addressLine == null)
                         continue;
 
-                    Object ItemValue;
-                    switch (AddressLine.ValueType)
+                    Object itemValue;
+                    switch (addressLine.ValueType)
                     {
                         case AddressListValueType.Integer:
-                            ItemValue = mem.ReadInt32((IntPtr)AddressLine.Address)
-                                / AddressLine.ValueScale;
+                            itemValue = mem.ReadInt32((IntPtr)addressLine.Address)
+                                / addressLine.ValueScale;
                             break;
                         case AddressListValueType.Float:
-                            ItemValue = mem.ReadFloat((IntPtr)AddressLine.Address)
-                                / AddressLine.ValueScale;
+                            itemValue = mem.ReadFloat((IntPtr)addressLine.Address)
+                                / addressLine.ValueScale;
                             break;
                         case AddressListValueType.Char4:
-                            ItemValue = mem.ReadChar4((IntPtr)AddressLine.Address);
+                            itemValue = mem.ReadChar4((IntPtr)addressLine.Address);
                             break;
                         default:
-                            ItemValue = "";
+                            itemValue = "";
                             break;
                     }
-                    CurrentItem.SubItems[1].Text = ItemValue.ToString();
+                    currentItem.SubItems[1].Text = itemValue.ToString();
                 }
             }
         }
@@ -221,52 +216,88 @@ namespace War3Trainer
         {
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_currentGameContext.ProcessId))
             {
-                foreach (ListViewItem CurrentItem in viewData.Items)
+                foreach (ListViewItem currentItem in viewData.Items)
                 {
-                    string ItemValueString = CurrentItem.SubItems[2].Text;
-                    if (ItemValueString.Trim() == "")
+                    string itemValueString = currentItem.SubItems[2].Text;
+                    if (String.IsNullOrEmpty(itemValueString))
                     {
                         // Not modified
                         continue;
                     }
 
-                    IAddressNode AddressLine = CurrentItem.Tag as IAddressNode;
-                    if (AddressLine == null)
+                    IAddressNode addressLine = currentItem.Tag as IAddressNode;
+                    if (addressLine == null)
                         continue;
 
-                    switch (AddressLine.ValueType)
+                    switch (addressLine.ValueType)
                     {
                         case AddressListValueType.Integer:
                             Int32 intValue;
-                            if (!Int32.TryParse(ItemValueString, out intValue))
+                            if (!Int32.TryParse(itemValueString, out intValue))
                                 intValue = 0;
-                            intValue = (Int32)(unchecked(intValue * AddressLine.ValueScale));
-                            mem.WriteInt32((IntPtr)AddressLine.Address, intValue);
+                            intValue = unchecked(intValue * addressLine.ValueScale);
+                            mem.WriteInt32((IntPtr)addressLine.Address, intValue);
                             break;
                         case AddressListValueType.Float:
                             float floatValue;
-                            if (!float.TryParse(ItemValueString, out floatValue))
+                            if (!float.TryParse(itemValueString, out floatValue))
                                 floatValue = 0;
-                            floatValue = unchecked(floatValue * AddressLine.ValueScale);
-                            mem.WriteFloat((IntPtr)AddressLine.Address, floatValue);
+                            floatValue = unchecked(floatValue * addressLine.ValueScale);
+                            mem.WriteFloat((IntPtr)addressLine.Address, floatValue);
                             break;
                         case AddressListValueType.Char4:
-                            mem.WriteChar4((IntPtr)AddressLine.Address, ItemValueString);
+                            mem.WriteChar4((IntPtr)addressLine.Address, itemValueString);
                             break;
                     }
-                    CurrentItem.SubItems[2].Text = "";
+                    currentItem.SubItems[2].Text = "";
                 }
             }
         }
 
         /************************************************************************/
-        /* GUI                                                                  */
+        /* Exception UI                                                         */
         /************************************************************************/
-        private void MenuFileExit_Click(object sender, EventArgs e)
+        private void ReportEnterDebugFailure()
         {
-            this.Close();
+            labGameScanState.Text = "请以管理员身份运行";
         }
 
+        private void ReportNoGameFoundFailure()
+        {
+            labGameScanState.Text = "游戏未运行，运行游戏后单击“查找游戏”";
+        }
+
+        private void ReportUnknownFailure(string message)
+        {
+            labGameScanState.Text = "发生未知错误：" + message;
+        }
+
+        private void ReportProcessIdFailure(int processId)
+        {
+            labGameScanState.Text = "错误的进程ID："
+                + processId.ToString();
+        }
+
+        private void ReportVersionFailure(int processId, string version)
+        {
+            labGameScanState.Text = "检测到游戏（"
+                + processId.ToString()
+                + "），但版本（"
+                + version
+                + "）不被支持";
+        }
+
+        private void ReportVersionOk(int processId, string version)
+        {
+            labGameScanState.Text = "检测到游戏（"
+                + processId.ToString()
+                + "），游戏版本："
+                + version;
+        }
+
+        /************************************************************************/
+        /* GUI                                                                  */
+        /************************************************************************/
         private void MenuHelpAbout_Click(object sender, EventArgs e)
         {
             MessageBox.Show("要求还挺高……" + System.Environment.NewLine + System.Environment.NewLine
@@ -277,6 +308,11 @@ namespace War3Trainer
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
+        
+        private void MenuFileExit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
 
         private void cmdGetAllObjects_Click(object sender, EventArgs e)
         {
@@ -284,9 +320,9 @@ namespace War3Trainer
             {
                 GetAllObject();
             }
-            catch (WindowsApi.BadProcessIdException)
+            catch (WindowsApi.BadProcessIdException ex)
             {
-                FindGame();
+                ReportProcessIdFailure(ex.ProcessId);
             }
         }
 
@@ -302,17 +338,17 @@ namespace War3Trainer
                 ApplyModify();
 
                 // Refresh left
-                TreeNode SelectedNode = viewFunctions.SelectedNode;
-                ITrainerNode FunctionNode = SelectedNode.Tag as ITrainerNode;
-                if (FunctionNode != null)
-                    RefreshSelectedObject(FunctionNode);
+                TreeNode selectedNode = viewFunctions.SelectedNode;
+                ITrainerNode functionNode = selectedNode.Tag as ITrainerNode;
+                if (functionNode != null)
+                    RefreshSelectedObject(functionNode);
 
                 // Refresh right
-                SelectAFunction(SelectedNode);
+                SelectFunction(selectedNode);
             }
-            catch (WindowsApi.BadProcessIdException)
+            catch (WindowsApi.BadProcessIdException ex)
             {
-                FindGame();
+                ReportProcessIdFailure(ex.ProcessId);
             }
         }
 
@@ -320,9 +356,9 @@ namespace War3Trainer
         {
             // Check whether modification is not saved
             bool isSaved = true;
-            foreach (ListViewItem CurrentItem in viewData.Items)
+            foreach (ListViewItem currentItem in viewData.Items)
             {
-                if (CurrentItem.SubItems[2].Text != "")
+                if (!String.IsNullOrEmpty(currentItem.SubItems[2].Text))
                 {
                     isSaved = false;
                     break;
@@ -338,11 +374,11 @@ namespace War3Trainer
             // Select another function
             try
             {
-                SelectAFunction(e.Node);
+                SelectFunction(e.Node);
             }
-            catch (WindowsApi.BadProcessIdException)
+            catch (WindowsApi.BadProcessIdException ex)
             {
-                FindGame();
+                ReportProcessIdFailure(ex.ProcessId);
             }
         }
 
@@ -377,11 +413,11 @@ namespace War3Trainer
         {
             if (viewData.SelectedItems.Count < 1)
                 return;
-            ListViewItem CurrentItem = viewData.SelectedItems[0];
+            ListViewItem currentItem = viewData.SelectedItems[0];
 
             txtInput.Location = new Point(
                 viewData.Columns[0].Width + viewData.Columns[1].Width,
-                CurrentItem.Position.Y - 2);
+                currentItem.Position.Y - 2);
             txtInput.Width = viewData.Columns[2].Width;
         }
 
@@ -398,18 +434,24 @@ namespace War3Trainer
 
         private void viewData_MouseUp(object sender, MouseEventArgs e)
         {
+            // Get item
             if (viewData.SelectedItems.Count < 1)
                 return;
-            ListViewItem CurrentItem = viewData.SelectedItems[0];
+            ListViewItem currentItem = viewData.SelectedItems[0];
 
+            // Edit box
             ReplaceInputTextbox();
 
-            txtInput.Tag = CurrentItem;
-            if (CurrentItem.SubItems[2].Text == "")
-                txtInput.Text = CurrentItem.SubItems[1].Text;
-            else
-                txtInput.Text = CurrentItem.SubItems[2].Text;
+            txtInput.Tag = currentItem;
 
+            int textToEdit;
+            if (String.IsNullOrEmpty(currentItem.SubItems[2].Text))
+                textToEdit = 1;
+            else
+                textToEdit = 2;
+            txtInput.Text = currentItem.SubItems[textToEdit].Text;
+
+            // Enable editing
             txtInput.Visible = true;
             txtInput.Focus();
             txtInput.Select(0, 0);  // Cancle select all
@@ -428,14 +470,14 @@ namespace War3Trainer
         private void txtInput_Leave(object sender, EventArgs e)
         {
             txtInput.Visible = false;
-            ListViewItem CurrentItem = txtInput.Tag as ListViewItem;
-            if (CurrentItem == null)
+            ListViewItem currentItem = txtInput.Tag as ListViewItem;
+            if (currentItem == null)
                 return;
 
-            if (CurrentItem.SubItems[1].Text != txtInput.Text)
-                CurrentItem.SubItems[2].Text = txtInput.Text;
+            if (currentItem.SubItems[1].Text != txtInput.Text)
+                currentItem.SubItems[2].Text = txtInput.Text;
             else
-                CurrentItem.SubItems[2].Text = "";
+                currentItem.SubItems[2].Text = "";
         }
 
         private void txtInput_KeyPress(object sender, KeyPressEventArgs e)
@@ -450,11 +492,11 @@ namespace War3Trainer
                     viewData.Focus();
                     if (viewData.SelectedItems.Count > 0)
                     {
-                        int NextIndex = viewData.SelectedItems[0].Index + 1;
-                        if (NextIndex < viewData.Items.Count)
+                        int nextIndex = viewData.SelectedItems[0].Index + 1;
+                        if (nextIndex < viewData.Items.Count)
                         {
-                            viewData.Items[NextIndex].Selected = true;
-                            viewData.Items[NextIndex].EnsureVisible();
+                            viewData.Items[nextIndex].Selected = true;
+                            viewData.Items[nextIndex].EnsureVisible();
                             viewData_MouseUp(sender, null);
                         }
                     }
@@ -473,13 +515,13 @@ namespace War3Trainer
         /************************************************************************/
         /* Debug                                                                */
         /************************************************************************/
-        private void MenuDebug1_Click(object sender, EventArgs e)
+        private void menuDebug1_Click(object sender, EventArgs e)
         {
             string strIndex = Microsoft.VisualBasic.Interaction.InputBox(
                 "nIndex = 0x?",
                 "War3Common.ReadFromGameMemory(nIndex)",
                 "0", -1, -1);
-            if (strIndex == "")
+            if (String.IsNullOrEmpty(strIndex))
                 return;
 
             Int32 nIndex;
@@ -492,27 +534,26 @@ namespace War3Trainer
                 nIndex = 0;
             }
 
-            UInt32 Result = 0;
             try
             {
+                UInt32 result = 0;
                 using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_currentGameContext.ProcessId))
                 {
                     NewChildrenEventArgs args = new NewChildrenEventArgs();
                     War3Common.GetGameMemory(
                         _currentGameContext, ref args);
-                    Result = War3Common.ReadFromGameMemory(
+                    result = War3Common.ReadFromGameMemory(
                         mem, _currentGameContext, args,
                         nIndex);
                 }
+                MessageBox.Show(
+                    "0x" + result.ToString("X"),
+                    "War3Common.ReadFromGameMemory(0x" + strIndex + ")");
             }
-            catch (WindowsApi.BadProcessIdException)
+            catch (WindowsApi.BadProcessIdException ex)
             {
-                FindGame();
+                ReportProcessIdFailure(ex.ProcessId);
             }
-
-            MessageBox.Show(
-                "0x" + Result.ToString("X"),
-                "War3Common.ReadFromGameMemory(0x" + strIndex + ")");
         }
     }
 }
