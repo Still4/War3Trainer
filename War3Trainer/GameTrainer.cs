@@ -14,13 +14,13 @@ namespace War3Trainer
 
         Introduction,
         Cash,
-        AllSelectedUnit,
+        AllSelectedUnits,
         OneSelectedUnit,
-        UnitPropety,
-        HeroPropety,
+        AttackAttributes,
+        HeroAttributes,
         //UnitAbility,  // Not implemented yet
-        AllUnitGoods,
-        OneGoods,
+        AllItems,
+        OneItem,
     }
 
     internal class NewChildrenEventArgs
@@ -29,12 +29,12 @@ namespace War3Trainer
         public TrainerNodeType NodeType { get; set; }
         public int ParentNodeIndex      { get; set; }
 
-        public UInt32 pThisGame         { get; set; }   // [6FAA4178]
-        public UInt32 pThisGameMemory   { get; set; }   // [ThisGame + 0xC]
-        public UInt32 pThisUnit         { get; set; }   // Unit ESI
-        public UInt32 pUnitAttributes   { get; set; }   // [ThisUnit + 1E4]
-        public UInt32 pHeroAttributes   { get; set; }   // [ThisUnit + 1EC]
-        public UInt32 pCurrentGoods     { get; set; }   // [ThisUnit + 1F4]...
+        public UInt32 ThisGameAddress         { get; set; }   // [6FAA4178]
+        public UInt32 ThisGameMemoryAddress   { get; set; }   // [ThisGame + 0xC]
+        public UInt32 ThisUnitAddress         { get; set; }   // Unit ESI
+        public UInt32 AttackAttributesAddress { get; set; }   // [ThisUnit + 1E4]
+        public UInt32 HeroAttributesAddress   { get; set; }   // [ThisUnit + 1EC]
+        public UInt32 CurrentItemPackAddress  { get; set; }   // [ThisUnit + 1F4]...
 
         public NewChildrenEventArgs()
         {
@@ -44,14 +44,14 @@ namespace War3Trainer
         {
             NewChildrenEventArgs retObject = new NewChildrenEventArgs();
 
-            retObject.NodeType        = this.NodeType;
-            retObject.ParentNodeIndex = this.ParentNodeIndex;
-            retObject.pThisGame       = this.pThisGame;
-            retObject.pThisGameMemory = this.pThisGameMemory;
-            retObject.pThisUnit       = this.pThisUnit;
-            retObject.pUnitAttributes = this.pUnitAttributes;
-            retObject.pHeroAttributes = this.pHeroAttributes;
-            retObject.pCurrentGoods   = this.pCurrentGoods;
+            retObject.NodeType                = this.NodeType;
+            retObject.ParentNodeIndex         = this.ParentNodeIndex;
+            retObject.ThisGameAddress         = this.ThisGameAddress;
+            retObject.ThisGameMemoryAddress   = this.ThisGameMemoryAddress;
+            retObject.ThisUnitAddress         = this.ThisUnitAddress;
+            retObject.AttackAttributesAddress = this.AttackAttributesAddress;
+            retObject.HeroAttributesAddress   = this.HeroAttributesAddress;
+            retObject.CurrentItemPackAddress  = this.CurrentItemPackAddress;
 
             return retObject;
         }
@@ -231,15 +231,15 @@ namespace War3Trainer
             NewChildrenEventReaction(this, args);
 
             // Get all other trainers
-            int Index = 0;
-            int Count = 1;
-            while (Index < Count)
+            int index = 0;
+            int count = 1;
+            while (index < count)
             {
                 lock (_allTrainers)
                 {
-                    _allTrainers[Index].CreateChildren();
-                    Index++;
-                    Count = _allTrainers.Count;
+                    _allTrainers[index].CreateChildren();
+                    index++;
+                    count = _allTrainers.Count;
                 }
             }
         }
@@ -255,34 +255,34 @@ namespace War3Trainer
                 switch (e.NodeType)
                 {
                     case TrainerNodeType.Root:
-                        newNode = new NodeRoot(newNodeIndex, _gameContext, e);
+                        newNode = new RootNode(newNodeIndex, _gameContext, e);
                         break;
                     case TrainerNodeType.Introduction:
-                        newNode = new NodeIntroduction(newNodeIndex, _gameContext, e);
+                        newNode = new IntroductionNode(newNodeIndex, _gameContext, e);
                         break;
                     case TrainerNodeType.Cash:
-                        newNode = new NodeCash(newNodeIndex, _gameContext, e);
+                        newNode = new CashNode(newNodeIndex, _gameContext, e);
                         break;
-                    case TrainerNodeType.AllSelectedUnit:
-                        newNode = new NodeAllSelectedUnit(newNodeIndex, _gameContext, e);
+                    case TrainerNodeType.AllSelectedUnits:
+                        newNode = new AllSelectedUnitsNode(newNodeIndex, _gameContext, e);
                         break;
                     case TrainerNodeType.OneSelectedUnit:
-                        newNode = new NodeOneSelectedUnit(newNodeIndex, _gameContext, e);
+                        newNode = new OneSelectedUnitNode(newNodeIndex, _gameContext, e);
                         break;
-                    case TrainerNodeType.UnitPropety:
-                        newNode = new NodeUnitPropety(newNodeIndex, _gameContext, e);
+                    case TrainerNodeType.AttackAttributes:
+                        newNode = new AttackAttributesNode(newNodeIndex, _gameContext, e);
                         break;
-                    case TrainerNodeType.HeroPropety:
-                        newNode = new NodeHeroPropety(newNodeIndex, _gameContext, e);
+                    case TrainerNodeType.HeroAttributes:
+                        newNode = new HeroAttributesNode(newNodeIndex, _gameContext, e);
                         break;
-                    //case TrainerNodeType.UnitAbility:
-                    //    newNode = new nodeUnitAbility(newNodeIndex, _GameContext, e);
+                    // case TrainerNodeType.UnitAbility:
+                    //    newNode = new UnitAbilityNode(newNodeIndex, _gameContext, e);
                     //    break;
-                    case TrainerNodeType.AllUnitGoods:
-                        newNode = new NodeAllUnitGoods(newNodeIndex, _gameContext, e);
+                    case TrainerNodeType.AllItems:
+                        newNode = new AllItemsNode(newNodeIndex, _gameContext, e);
                         break;
-                    case TrainerNodeType.OneGoods:
-                        newNode = new NodeOneGoods(newNodeIndex, _gameContext, e);
+                    case TrainerNodeType.OneItem:
+                        newNode = new OneItemNode(newNodeIndex, _gameContext, e);
                         break;
                     default:
                         throw new System.ArgumentException("e.NodeType");
@@ -308,7 +308,7 @@ namespace War3Trainer
     
     //////////////////////////////////////////////////////////////////////////
     // Concrete trainer
-    class NodeRoot
+    class RootNode
         : TrainerNode, ITrainerNode
     {
         public TrainerNodeType NodeType { get { return TrainerNodeType.Root; } }
@@ -317,27 +317,27 @@ namespace War3Trainer
         public int NodeIndex { get { return _nodeIndex; } }
         public int ParentIndex { get { return _parentIndex; } }
 
-        public NodeRoot(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
+        public RootNode(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
             : base(nodeIndex, gameContext, args)
         {
         }
 
         public override void CreateChildren()
         {
-            // This will fill the following value(s):
-            //      _NewChildrenArgs.pThisGame
-            //      _NewChildrenArgs.pThisGameMemory
+            // This function will fill the following value(s):
+            //      _newChildrenArgs.ThisGame
+            //      _newChildrenArgs.ThisGameMemory
             War3Common.GetGameMemory(
                 _gameContext,
                 ref _newChildrenArgs);
             
             base.CreateChild(TrainerNodeType.Introduction, NodeIndex);
             base.CreateChild(TrainerNodeType.Cash, NodeIndex);
-            base.CreateChild(TrainerNodeType.AllSelectedUnit, NodeIndex);
+            base.CreateChild(TrainerNodeType.AllSelectedUnits, NodeIndex);
         }
     }
 
-    class NodeIntroduction
+    class IntroductionNode
         : TrainerNode, ITrainerNode
     {
         public TrainerNodeType NodeType { get { return TrainerNodeType.Introduction; } }
@@ -346,7 +346,7 @@ namespace War3Trainer
         public int NodeIndex { get { return _nodeIndex; } }
         public int ParentIndex { get { return _parentIndex; } }
 
-        public NodeIntroduction(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
+        public IntroductionNode(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
             : base(nodeIndex, gameContext, args)
         {
         }
@@ -356,7 +356,7 @@ namespace War3Trainer
         }
     }
 
-    class NodeCash
+    class CashNode
         : TrainerNode, ITrainerNode
     {
         public TrainerNodeType NodeType { get { return TrainerNodeType.Cash; } }
@@ -365,7 +365,7 @@ namespace War3Trainer
         public int NodeIndex { get { return _nodeIndex; } }
         public int ParentIndex { get { return _parentIndex; } }
 
-        public NodeCash(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
+        public CashNode(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
             : base(nodeIndex, gameContext, args)
         {
         }
@@ -414,16 +414,16 @@ namespace War3Trainer
         }
     }
 
-    class NodeAllSelectedUnit
+    class AllSelectedUnitsNode
         : TrainerNode, ITrainerNode
     {
-        public TrainerNodeType NodeType { get { return TrainerNodeType.AllSelectedUnit; } }
+        public TrainerNodeType NodeType { get { return TrainerNodeType.AllSelectedUnits; } }
         public string NodeTypeName { get { return "选中单位列表"; } }
 
         public int NodeIndex { get { return _nodeIndex; } }
         public int ParentIndex { get { return _parentIndex; } }
         
-        public NodeAllSelectedUnit(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
+        public AllSelectedUnitsNode(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
             : base(nodeIndex, gameContext, args)
         {
         }
@@ -433,22 +433,22 @@ namespace War3Trainer
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_gameContext.ProcessId))
             {
                 // Get ESI of each selected unit
-                UInt32 selectedUnitList = mem.ReadUInt32((IntPtr)_gameContext.War3AddressSelectedUnitList);
+                UInt32 selectedUnitList = mem.ReadUInt32((IntPtr)_gameContext.UnitListAddress);
                 UInt16 a2 = mem.ReadUInt16((IntPtr)unchecked(selectedUnitList + 0x28));
                 UInt32 tmpAddress;
                 tmpAddress = mem.ReadUInt32((IntPtr)unchecked(selectedUnitList + 0x58 + 4 * a2));
                 tmpAddress = mem.ReadUInt32((IntPtr)unchecked(tmpAddress + 0x34));
 
                 UInt32 listHead   = mem.ReadUInt32((IntPtr)unchecked(tmpAddress + 0x1F0));
-                // UInt32 ListEnd = mem.ReadUInt32((IntPtr)unchecked(tmpAddress + 0x1F4));
+                // UInt32 listEnd = mem.ReadUInt32((IntPtr)unchecked(tmpAddress + 0x1F4));
                 UInt32 listLength = mem.ReadUInt32((IntPtr)unchecked(tmpAddress + 0x1F8));
 
                 UInt32 nextNode = listHead;
-                //UInt32 NextNodeNot = ~ListHead;
+                // UInt32 nextNodeNot = ~listHead;
                 for (int selectedUnitIndex = 0; selectedUnitIndex < listLength; selectedUnitIndex++)
                 {
-                    _newChildrenArgs.pThisUnit = mem.ReadUInt32((IntPtr)unchecked(nextNode + 8));
-                    // NextNodeNot             = mem.ReadUInt32((IntPtr)unchecked(NextNode + 4));
+                    _newChildrenArgs.ThisUnitAddress = mem.ReadUInt32((IntPtr)unchecked(nextNode + 8));
+                    // nextNodeNot             = mem.ReadUInt32((IntPtr)unchecked(NextNode + 4));
                     nextNode                   = mem.ReadUInt32((IntPtr)unchecked(nextNode + 0));
 
                     base.CreateChild(TrainerNodeType.OneSelectedUnit, NodeIndex);
@@ -457,7 +457,7 @@ namespace War3Trainer
         }
     }
 
-    class NodeOneSelectedUnit
+    class OneSelectedUnitNode
         : TrainerNode, ITrainerNode
     {
         public TrainerNodeType NodeType { get { return TrainerNodeType.OneSelectedUnit; } }
@@ -467,7 +467,7 @@ namespace War3Trainer
             {
                 // return "单位";
                 return "0x"
-                    + _newChildrenArgs.pThisUnit.ToString("X")
+                    + _newChildrenArgs.ThisUnitAddress.ToString("X")
                     + ": "
                     + GetUnitName();
             }
@@ -476,7 +476,7 @@ namespace War3Trainer
         public int NodeIndex { get { return _nodeIndex; } }
         public int ParentIndex { get { return _parentIndex; } }
         
-        public NodeOneSelectedUnit(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
+        public OneSelectedUnitNode(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
             : base(nodeIndex, gameContext, args)
         {
         }
@@ -485,7 +485,7 @@ namespace War3Trainer
         {
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_gameContext.ProcessId))
             {
-                return mem.ReadChar4((IntPtr)unchecked(_newChildrenArgs.pThisUnit + 0x30));
+                return mem.ReadChar4((IntPtr)unchecked(_newChildrenArgs.ThisUnitAddress + 0x30));
             }
         }
 
@@ -493,30 +493,30 @@ namespace War3Trainer
         {
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_gameContext.ProcessId))
             {
-                _newChildrenArgs.pUnitAttributes = mem.ReadUInt32((IntPtr)unchecked(_newChildrenArgs.pThisUnit + _gameContext.War3OffsetUnitAttributes));
-                _newChildrenArgs.pHeroAttributes = mem.ReadUInt32((IntPtr)unchecked(_newChildrenArgs.pThisUnit + _gameContext.War3OffsetHeroAttributes));
+                _newChildrenArgs.AttackAttributesAddress = mem.ReadUInt32((IntPtr)unchecked(_newChildrenArgs.ThisUnitAddress + _gameContext.AttackAttributesOffset));
+                _newChildrenArgs.HeroAttributesAddress = mem.ReadUInt32((IntPtr)unchecked(_newChildrenArgs.ThisUnitAddress + _gameContext.HeroAttributesOffset));
 
-                if (_newChildrenArgs.pUnitAttributes > 0)
+                if (_newChildrenArgs.AttackAttributesAddress > 0)
                 {
-                    base.CreateChild(TrainerNodeType.UnitPropety, NodeIndex);
-                    //base.CreateChild(TrainerNodeType.UnitAbility, NodeIndex);
-                    base.CreateChild(TrainerNodeType.AllUnitGoods, NodeIndex);
+                    base.CreateChild(TrainerNodeType.AttackAttributes, NodeIndex);
+                    // base.CreateChild(TrainerNodeType.UnitAbility, NodeIndex);
+                    base.CreateChild(TrainerNodeType.AllItems, NodeIndex);
                 }
 
-                if (_newChildrenArgs.pHeroAttributes > 0)
+                if (_newChildrenArgs.HeroAttributesAddress > 0)
                 {
-                    base.CreateChild(TrainerNodeType.HeroPropety, NodeIndex);
+                    base.CreateChild(TrainerNodeType.HeroAttributes, NodeIndex);
                 }
 
                 // Unit self propety(s)
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                     "单位名称",
-                    unchecked(_newChildrenArgs.pThisUnit + 0x30),
+                    unchecked(_newChildrenArgs.ThisUnitAddress + 0x30),
                     AddressListValueType.Char4));
 
                 UInt32 tmpAddress1, tmpAddress2;
                 Int32 tmpValue1, tmpValue2;
-                tmpValue1 = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.pThisUnit + 0x98 + 0x8));
+                tmpValue1 = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.ThisUnitAddress + 0x98 + 0x8));
                 tmpAddress1 = War3Common.ReadFromGameMemory(
                     mem, _gameContext, _newChildrenArgs,
                     tmpValue1);
@@ -531,10 +531,10 @@ namespace War3Trainer
                     AddressListValueType.Float));
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                     "HP - 回复率",
-                    unchecked(_newChildrenArgs.pThisUnit + 0xB0),
+                    unchecked(_newChildrenArgs.ThisUnitAddress + 0xB0),
                     AddressListValueType.Float));
 
-                tmpValue1 = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.pThisUnit + 0x98 + 0x28));
+                tmpValue1 = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.ThisUnitAddress + 0x98 + 0x28));
                 tmpAddress1 = War3Common.ReadFromGameMemory(
                     mem, _gameContext, _newChildrenArgs,
                     tmpValue1);
@@ -549,20 +549,20 @@ namespace War3Trainer
                     AddressListValueType.Float));
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                    "MP - 回复率",
-                   unchecked(_newChildrenArgs.pThisUnit + 0xD4),
+                   unchecked(_newChildrenArgs.ThisUnitAddress + 0xD4),
                    AddressListValueType.Float));
                 
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                     "盔甲 - 数量",
-                    unchecked(_newChildrenArgs.pThisUnit + 0xE0),
+                    unchecked(_newChildrenArgs.ThisUnitAddress + 0xE0),
                     AddressListValueType.Float));
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                     "盔甲 - 种类",
-                    unchecked(_newChildrenArgs.pThisUnit + 0xE4),
+                    unchecked(_newChildrenArgs.ThisUnitAddress + 0xE4),
                     AddressListValueType.Integer));
                 
                 // Move speed
-                tmpAddress1 = unchecked(_newChildrenArgs.pThisUnit + _gameContext.War3OffsetMoveSpeed - 0x24);
+                tmpAddress1 = unchecked(_newChildrenArgs.ThisUnitAddress + _gameContext.MoveSpeedOffset - 0x24);
                 do
                 {
                     tmpValue1 = mem.ReadInt32((IntPtr)unchecked(tmpAddress1 + 0x24));
@@ -576,7 +576,7 @@ namespace War3Trainer
                     // Note: If new game version released, set breakpoint here
                     //       and check tmpAddress2. Set this value as War3AddressMoveSpeed
                     tmpAddress2 = mem.ReadUInt32((IntPtr)unchecked(tmpAddress2 + 0x2D4));
-                    if (_gameContext.War3AddressMoveSpeed == tmpAddress2)
+                    if (_gameContext.MoveSpeedAddress == tmpAddress2)
                     {
                         CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                             "移动速度",
@@ -586,7 +586,7 @@ namespace War3Trainer
                 } while (tmpValue1 > 0 && tmpValue2 > 0);
 
                 // Coordinate
-                tmpValue1 = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.pThisUnit + 0x164 + 8));
+                tmpValue1 = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.ThisUnitAddress + 0x164 + 8));
                 tmpAddress1 = War3Common.ReadGameValue1(
                     mem, _gameContext, _newChildrenArgs,
                     tmpValue1);
@@ -602,16 +602,16 @@ namespace War3Trainer
         }
     }
 
-    class NodeUnitPropety
+    class AttackAttributesNode
         : TrainerNode, ITrainerNode
     {
-        public TrainerNodeType NodeType { get { return TrainerNodeType.UnitPropety; } }
-        public string NodeTypeName { get { return "单位属性"; } }
+        public TrainerNodeType NodeType { get { return TrainerNodeType.AttackAttributes; } }
+        public string NodeTypeName { get { return "战斗属性"; } }
 
         public int NodeIndex { get { return _nodeIndex; } }
         public int ParentIndex { get { return _parentIndex; } }
 
-        public NodeUnitPropety(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
+        public AttackAttributesNode(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
             : base(nodeIndex, gameContext, args)
         {
         }
@@ -620,123 +620,123 @@ namespace War3Trainer
         {
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击频率比",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x1B0),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x1B0),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "主动攻击范围",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x244),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x244),
                 AddressListValueType.Float));
             
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 倍乘",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x88 + 0 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x88 + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 骰子",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x94 + 0 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x94 + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 基础1",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xA0 + 0 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xA0 + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 基础2",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xAC + 0 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xAC + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 丢失因子",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xBC + 0 * 16),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xBC + 0 * 16),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 攻击音效",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xE8 + 0 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xE8 + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 种类",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xF4 + 0 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xF4 + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 最大目标数",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x100 + 0 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x100 + 0 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 间隔",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x158 + 0 * 8),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x158 + 0 * 8),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 首次延时",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x16C + 0 * 16),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x16C + 0 * 16),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 范围",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x258 + 0 * 8),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x258 + 0 * 8),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击1 - 范围缓冲",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x26C + 0 * 8),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x26C + 0 * 8),
                 AddressListValueType.Float));
             
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 倍乘",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x88 + 1 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x88 + 1 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 骰子",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x94 + 1 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x94 + 1 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 基础1",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xA0 + 1 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xA0 + 1 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 基础2",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xAC + 1 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xAC + 1 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 丢失因子",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xBC + 1 * 16),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xBC + 1 * 16),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 攻击音效",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xE8 + 1 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xE8 + 1 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 种类",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0xF4 + 1 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0xF4 + 1 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 最大目标数",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x100 + 1 * 4),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x100 + 1 * 4),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 间隔",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x158 + 1 * 8),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x158 + 1 * 8),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 首次延时",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x16C + 1 * 16),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x16C + 1 * 16),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 范围",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x258 + 1 * 8),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x258 + 1 * 8),
                 AddressListValueType.Float));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "攻击2 - 范围缓冲",
-                unchecked(_newChildrenArgs.pUnitAttributes + 0x26C + 1 * 8),
+                unchecked(_newChildrenArgs.AttackAttributesAddress + 0x26C + 1 * 8),
                 AddressListValueType.Float));
         }
     }
 
-    class NodeHeroPropety
+    class HeroAttributesNode
         : TrainerNode, ITrainerNode
     {
-        public TrainerNodeType NodeType { get { return TrainerNodeType.HeroPropety; } }
+        public TrainerNodeType NodeType { get { return TrainerNodeType.HeroAttributes; } }
         public string NodeTypeName { get { return "英雄属性"; } }
 
         public int NodeIndex { get { return _nodeIndex; } }
         public int ParentIndex { get { return _parentIndex; } }
         
-        public NodeHeroPropety(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
+        public HeroAttributesNode(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
             : base(nodeIndex, gameContext, args)
         {
         }
@@ -745,22 +745,22 @@ namespace War3Trainer
         {
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "经验值",
-                unchecked(_newChildrenArgs.pHeroAttributes + 0x8C),
+                unchecked(_newChildrenArgs.HeroAttributesAddress + 0x8C),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "力量",
-                unchecked(_newChildrenArgs.pHeroAttributes + 0x94),
+                unchecked(_newChildrenArgs.HeroAttributesAddress + 0x94),
                 AddressListValueType.Integer));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "敏捷",
-                unchecked(_newChildrenArgs.pHeroAttributes + 0xA8),
+                unchecked(_newChildrenArgs.HeroAttributesAddress + 0xA8),
                 AddressListValueType.Integer));
 
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_gameContext.ProcessId))
             {
                 UInt32 tmpAddress1;
                 Int32 tmpValue1;
-                tmpValue1 = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.pHeroAttributes + 0x7C + 2 * 4));
+                tmpValue1 = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.HeroAttributesAddress + 0x7C + 2 * 4));
                 tmpAddress1 = War3Common.ReadGameValue1(
                     mem, _gameContext, _newChildrenArgs,
                     tmpValue1);
@@ -772,28 +772,28 @@ namespace War3Trainer
             
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "可用技能点",
-                unchecked(_newChildrenArgs.pHeroAttributes + 0x90),
+                unchecked(_newChildrenArgs.HeroAttributesAddress + 0x90),
                 AddressListValueType.Integer));
 
             for (UInt32 LearningAbilityIndex = 1; LearningAbilityIndex <= 5; LearningAbilityIndex++)
             {
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                     "学习技能" + LearningAbilityIndex.ToString() + " - 名称",
-                    unchecked(_newChildrenArgs.pHeroAttributes + 0xF0 + LearningAbilityIndex * 4),
+                    unchecked(_newChildrenArgs.HeroAttributesAddress + 0xF0 + LearningAbilityIndex * 4),
                     AddressListValueType.Char4));
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                     "学习技能" + LearningAbilityIndex.ToString() + " - 等级",
-                    unchecked(_newChildrenArgs.pHeroAttributes + 0x108 + LearningAbilityIndex * 4),
+                    unchecked(_newChildrenArgs.HeroAttributesAddress + 0x108 + LearningAbilityIndex * 4),
                     AddressListValueType.Integer));
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                     "学习技能" + LearningAbilityIndex.ToString() + " - 要求",
-                    unchecked(_newChildrenArgs.pHeroAttributes + 0x120 + LearningAbilityIndex * 4),
+                    unchecked(_newChildrenArgs.HeroAttributesAddress + 0x120 + LearningAbilityIndex * 4),
                     AddressListValueType.Integer));
             }
         }
     }
     /*
-    class NodeUnitAbility
+    class UnitAbilityNode
         : TrainerNode, ITrainerNode
     {
         public TrainerNodeType NodeType { get { return TrainerNodeType.UnitAbility; } }
@@ -812,16 +812,16 @@ namespace War3Trainer
         }
     }
     */
-    class NodeAllUnitGoods
+    class AllItemsNode
         : TrainerNode, ITrainerNode
     {
-        public TrainerNodeType NodeType { get { return TrainerNodeType.AllUnitGoods; } }
+        public TrainerNodeType NodeType { get { return TrainerNodeType.AllItems; } }
         public string NodeTypeName { get { return "物品列表"; } }
 
         public int NodeIndex { get { return _nodeIndex; } }
         public int ParentIndex { get { return _parentIndex; } }
 
-        public NodeAllUnitGoods(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
+        public AllItemsNode(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
             : base(nodeIndex, gameContext, args)
         {
         }
@@ -830,7 +830,7 @@ namespace War3Trainer
         {
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_gameContext.ProcessId))
             {
-                Int32 list = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.pThisUnit + _gameContext.War3OffsetGoodsList));
+                Int32 list = mem.ReadInt32((IntPtr)unchecked(_newChildrenArgs.ThisUnitAddress + _gameContext.ItemsListOffset));
                 if (list != 0)
                 {
                     for (Int32 itemIndex = 0; itemIndex < 6; itemIndex++)
@@ -852,8 +852,8 @@ namespace War3Trainer
                             }
                             if (currentItem != 0)
                             {
-                                _newChildrenArgs.pCurrentGoods = currentItem;
-                                base.CreateChild(TrainerNodeType.OneGoods, NodeIndex);
+                                _newChildrenArgs.CurrentItemPackAddress = currentItem;
+                                base.CreateChild(TrainerNodeType.OneItem, NodeIndex);
                             }
                         }
                     }   // foreach items
@@ -862,17 +862,17 @@ namespace War3Trainer
         }   // CreateChildren()
     }
 
-    class NodeOneGoods
+    class OneItemNode
         : TrainerNode, ITrainerNode
     {
-        public TrainerNodeType NodeType { get { return TrainerNodeType.OneGoods; } }
+        public TrainerNodeType NodeType { get { return TrainerNodeType.OneItem; } }
         public string NodeTypeName
         {
             get
             {
                 // return "物品";
                 return "0x"
-                    + _newChildrenArgs.pCurrentGoods.ToString("X")
+                    + _newChildrenArgs.CurrentItemPackAddress.ToString("X")
                     + ": "
                     + GetItemName();
             }
@@ -885,11 +885,11 @@ namespace War3Trainer
         {
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(_gameContext.ProcessId))
             {
-                return mem.ReadChar4((IntPtr)unchecked(_newChildrenArgs.pCurrentGoods + 0x30));
+                return mem.ReadChar4((IntPtr)unchecked(_newChildrenArgs.CurrentItemPackAddress + 0x30));
             }
         }
 
-        public NodeOneGoods(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
+        public OneItemNode(int nodeIndex, GameContext gameContext, NewChildrenEventArgs args)
             : base(nodeIndex, gameContext, args)
         {
         }
@@ -898,11 +898,11 @@ namespace War3Trainer
         {
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "物品名称",
-                unchecked(_newChildrenArgs.pCurrentGoods + 0x30),
+                unchecked(_newChildrenArgs.CurrentItemPackAddress + 0x30),
                 AddressListValueType.Char4));
             CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                 "使用次数",
-                unchecked(_newChildrenArgs.pCurrentGoods + 0x84),
+                unchecked(_newChildrenArgs.CurrentItemPackAddress + 0x84),
                 AddressListValueType.Integer));
          }
     }

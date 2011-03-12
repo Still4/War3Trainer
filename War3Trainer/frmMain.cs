@@ -66,7 +66,7 @@ namespace War3Trainer
                 this._currentGameContext = null;
                 ReportProcessIdFailure(ex.ProcessId);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 // Why here?
                 _currentGameContext = null;

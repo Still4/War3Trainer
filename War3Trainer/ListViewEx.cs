@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Security.Permissions;
 
 namespace War3Trainer
 {
@@ -17,7 +18,7 @@ namespace War3Trainer
             InitializeComponent();
         }
 
-        [System.Security.Permissions.SecurityPermission(System.Security.Permissions.SecurityAction.LinkDemand, Flags = System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode)]
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
         {
             if (m.Msg == WM_VSCROLL ||

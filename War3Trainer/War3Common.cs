@@ -11,21 +11,21 @@ namespace War3Trainer
         {
             using (WindowsApi.ProcessMemory mem = new WindowsApi.ProcessMemory(gameContext.ProcessId))
             {
-                gameAddress.pThisGame = mem.ReadUInt32((IntPtr)gameContext.War3AddressThisGame);
-                if (gameAddress.pThisGame != 0)
+                gameAddress.ThisGameAddress = mem.ReadUInt32((IntPtr)gameContext.ThisGameAddress);
+                if (gameAddress.ThisGameAddress != 0)
                 {
-                    gameAddress.pThisGameMemory = mem.ReadUInt32((IntPtr)unchecked(gameAddress.pThisGame + 0xC));
-                    if (gameAddress.pThisGameMemory == 0xFFFFFFFF)
-                        gameAddress.pThisGameMemory = 0;
+                    gameAddress.ThisGameMemoryAddress = mem.ReadUInt32((IntPtr)unchecked(gameAddress.ThisGameAddress + 0xC));
+                    if (gameAddress.ThisGameMemoryAddress == 0xFFFFFFFF)
+                        gameAddress.ThisGameMemoryAddress = 0;
                 }
 
-                if (gameAddress.pThisGame == 0
-                    || gameAddress.pThisGameMemory == 0)
+                if (gameAddress.ThisGameAddress == 0
+                    || gameAddress.ThisGameMemoryAddress == 0)
                 {
-                    gameAddress.pThisGameMemory = 0;
-                    gameAddress.pThisUnit = 0;
-                    gameAddress.pUnitAttributes = 0;
-                    gameAddress.pHeroAttributes = 0;
+                    gameAddress.ThisGameMemoryAddress = 0;
+                    gameAddress.ThisUnitAddress = 0;
+                    gameAddress.AttackAttributesAddress = 0;
+                    gameAddress.HeroAttributesAddress = 0;
                 }
             }
         }
@@ -38,10 +38,10 @@ namespace War3Trainer
         {
             System.Diagnostics.Debug.Assert(index >= 0);
 
-            if (gameAddress.pThisGameMemory == 0)
+            if (gameAddress.ThisGameMemoryAddress == 0)
                 return 0;
 
-            return mem.ReadUInt32((IntPtr)unchecked(gameAddress.pThisGameMemory + index * 8 + 4));
+            return mem.ReadUInt32((IntPtr)unchecked(gameAddress.ThisGameMemoryAddress + index * 8 + 4));
         }
 
         // Game memory extract algorithm 1
@@ -50,7 +50,7 @@ namespace War3Trainer
             WindowsApi.ProcessMemory mem, GameContext gameContext, NewChildrenEventArgs gameAddress,
             Int32 index)
         {
-            if (gameAddress.pThisGameMemory == 0)
+            if (gameAddress.ThisGameMemoryAddress == 0)
                 return 0;
 
             return unchecked(0x78 + ReadFromGameMemory(
@@ -64,7 +64,7 @@ namespace War3Trainer
             WindowsApi.ProcessMemory mem, GameContext gameContext, NewChildrenEventArgs gameAddress,
             Int32 index)
         {
-            if (gameAddress.pThisGameMemory == 0)
+            if (gameAddress.ThisGameMemoryAddress == 0)
                 return 0;
 
             UInt32 tmpValue = ReadFromGameMemory(
