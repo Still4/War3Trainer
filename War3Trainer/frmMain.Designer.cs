@@ -48,9 +48,9 @@
             this.splitMain = new System.Windows.Forms.SplitContainer();
             this.lblEmpty = new System.Windows.Forms.Label();
             this.viewData = new War3Trainer.ListViewEx();
-            this.colName = new System.Windows.Forms.ColumnHeader();
-            this.colOriginalValue = new System.Windows.Forms.ColumnHeader();
-            this.colUnsavedValue = new System.Windows.Forms.ColumnHeader();
+            this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colOriginalValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colUnsavedValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.txtInput = new System.Windows.Forms.TextBox();
             this.toolContainer.ContentPanel.SuspendLayout();
             this.toolContainer.TopToolStripPanel.SuspendLayout();
@@ -221,9 +221,9 @@
             // 
             // splitMain
             // 
-            this.splitMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.splitMain.Location = new System.Drawing.Point(8, 58);
             this.splitMain.Name = "splitMain";
             // 
@@ -268,9 +268,9 @@
             this.viewData.UseCompatibleStateImageBehavior = false;
             this.viewData.View = System.Windows.Forms.View.Details;
             this.viewData.Scrolling += new System.EventHandler(this.viewData_Scrolling);
-            this.viewData.MouseUp += new System.Windows.Forms.MouseEventHandler(this.viewData_MouseUp);
-            this.viewData.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.viewData_KeyPress);
             this.viewData.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.viewData_ColumnWidthChanging);
+            this.viewData.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.viewData_KeyPress);
+            this.viewData.MouseUp += new System.Windows.Forms.MouseEventHandler(this.viewData_MouseUp);
             // 
             // colName
             // 
@@ -312,7 +312,7 @@
             this.Controls.Add(this.cmdGetAllObjects);
             this.Controls.Add(this.toolContainer);
             this.Name = "FrmMain";
-            this.Text = "魔兽3内存修改器 v11";
+            this.Text = "魔兽3内存修改器 v12";
             this.Load += new System.EventHandler(this.FrmMain_Load);
             this.toolContainer.ContentPanel.ResumeLayout(false);
             this.toolContainer.ContentPanel.PerformLayout();

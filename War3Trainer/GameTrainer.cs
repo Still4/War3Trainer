@@ -548,9 +548,9 @@ namespace War3Trainer
                     tmpAddress1,
                     AddressListValueType.Float));
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
-                   "MP - 回复率",
-                   unchecked(_newChildrenArgs.ThisUnitAddress + 0xD4),
-                   AddressListValueType.Float));
+                    "MP - 回复率",
+                    unchecked(_newChildrenArgs.ThisUnitAddress + 0xD4),
+                    AddressListValueType.Float));
                 
                 CreateAddress(new NewAddressListEventArgs(_nodeIndex,
                     "盔甲 - 数量",
