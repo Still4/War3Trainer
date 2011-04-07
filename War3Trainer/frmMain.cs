@@ -297,7 +297,8 @@ namespace War3Trainer
             labGameScanState.Text = "检测到游戏（"
                 + processId.ToString()
                 + "），游戏版本："
-                + version;
+                + version
+                + "（支持）";
         }
 
         /************************************************************************/
@@ -309,7 +310,7 @@ namespace War3Trainer
                 + "其实说明都写在软件第1页了，" + System.Environment.NewLine
                 + "没啥好解释的。有更多问题来信" + System.Environment.NewLine
                 + "吧：tctianchi@163.com",
-                "修改器",
+                "War3Trainer",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
@@ -416,7 +417,7 @@ namespace War3Trainer
         }
 
         //////////////////////////////////////////////////////////////////////////       
-        // Make List view editable
+        // Make the ListView editable
         private void ReplaceInputTextbox()
         {
             if (viewData.SelectedItems.Count < 1)
@@ -447,7 +448,7 @@ namespace War3Trainer
                 return;
             ListViewItem currentItem = viewData.SelectedItems[0];
 
-            // Edit box
+            // Determine the content of edit box
             ReplaceInputTextbox();
 
             txtInput.Tag = currentItem;
@@ -462,7 +463,7 @@ namespace War3Trainer
             // Enable editing
             txtInput.Visible = true;
             txtInput.Focus();
-            txtInput.Select(0, 0);  // Cancle select all
+            txtInput.Select(0, 0);  // Cancel select all
         }
 
         private void viewData_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
@@ -488,35 +489,59 @@ namespace War3Trainer
                 currentItem.SubItems[2].Text = "";
         }
 
-        private void txtInput_KeyPress(object sender, KeyPressEventArgs e)
+        private void txtInput_KeyDown(object sender, KeyEventArgs e)
         {
-            switch ((Keys)e.KeyChar)
+            switch (e.KeyCode)
             {
                 case Keys.Enter:
-                    // Commit
-                    txtInput_Leave(sender, null);
-
-                    // Move next
-                    viewData.Focus();
-                    if (viewData.SelectedItems.Count > 0)
-                    {
-                        int nextIndex = viewData.SelectedItems[0].Index + 1;
-                        if (nextIndex < viewData.Items.Count)
-                        {
-                            viewData.Items[nextIndex].Selected = true;
-                            viewData.Items[nextIndex].EnsureVisible();
-                            viewData_MouseUp(sender, null);
-                        }
-                    }
-                    
+                    CommitEditAndMoveNext(sender, 1);
+                    e.Handled = true;
+                    break;
+                case Keys.Up:
+                    CommitEditAndMoveNext(sender, -1);
+                    e.Handled = true;
+                    break;
+                case Keys.Down:
+                    CommitEditAndMoveNext(sender, 1);
                     e.Handled = true;
                     break;
                 case Keys.Escape:
-                    // Roll back
-                    viewData_MouseUp(sender, null);
-                    txtInput_Leave(sender, null);
+                    DiscardEdit(sender);
                     e.Handled = true;
                     break;
+            }
+        }
+
+        private void DiscardEdit(object editBox)
+        {
+            // Roll back content of the edit box
+            viewData_MouseUp(editBox, null);
+
+            // Hide edit box
+            txtInput_Leave(editBox, null);
+
+            // Restore focus
+            viewData.Focus();
+        }
+
+        private void CommitEditAndMoveNext(object editBox, int delta)
+        {
+            // Commit
+            txtInput_Leave(editBox, null);
+
+            // Move to another line
+            viewData.Focus();
+            if (viewData.SelectedItems.Count > 0)
+            {
+                int nextIndex = viewData.SelectedItems[0].Index + delta;
+                if (nextIndex < viewData.Items.Count &&
+                    nextIndex >= 0)
+                {
+                    viewData.Items[nextIndex].Selected = true;
+                    viewData.Items[nextIndex].Focused = true;
+                    viewData.Items[nextIndex].EnsureVisible();
+                }
+                viewData_MouseUp(editBox, null);
             }
         }
 

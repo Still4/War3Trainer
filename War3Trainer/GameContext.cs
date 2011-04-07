@@ -55,37 +55,27 @@ namespace War3Trainer
             }
             catch
             {
-                throw new WindowsApi.BadProcessIdException(0);
+                throw new InvalidOperationException("Failed to fetch process Id");
             }
         }
 
         private void GetModuleInfo(Process gameProcess, string moduleName)
         {
-            ProcessModule mainModule = null;
-            foreach (ProcessModule module in gameProcess.Modules)
-            {
-                // Find module
-                if (module.ModuleName.ToLower() != moduleName.ToLower())
-                    continue;
+            // Find module
+            WindowsApi.ProcessModule mainModule =
+                new WindowsApi.ProcessModule(
+                    ProcessId,
+                    moduleName);
 
-                // Get version
-                // Example: "1, 22, 0, 6328"
-                string fileVersion = module.FileVersionInfo.FileVersion;
-                if (fileVersion == null)
-                    continue;
-                this.ProcessVersion = fileVersion.Replace(", ", ".");
+            // Check parameters
+            string moduleFileName = mainModule.FileName;
+            System.Diagnostics.FileVersionInfo moduleVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(moduleFileName);
+            string fileVersion = moduleVersion.FileVersion;
+            if (fileVersion == null)
+                throw new InvalidOperationException("Bad file version");
 
-                // Save
-                mainModule = module;
-                break;
-            }
-            if (mainModule == null)
-            {
-                // Main module not found
-                throw new WindowsApi.BadProcessIdException(this.ProcessId);
-            }
-
-            // Base address of module
+            // Save info
+            this.ProcessVersion = fileVersion.Replace(", ", ".");
             _moduleAddress = (uint)mainModule.BaseAddress;
         }
 
