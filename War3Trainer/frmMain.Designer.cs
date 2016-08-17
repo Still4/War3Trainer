@@ -312,7 +312,7 @@
             this.Controls.Add(this.cmdGetAllObjects);
             this.Controls.Add(this.toolContainer);
             this.Name = "FrmMain";
-            this.Text = "魔兽3内存修改器 v12";
+            this.Text = "魔兽3内存修改器 v13";
             this.Load += new System.EventHandler(this.FrmMain_Load);
             this.toolContainer.ContentPanel.ResumeLayout(false);
             this.toolContainer.ContentPanel.PerformLayout();

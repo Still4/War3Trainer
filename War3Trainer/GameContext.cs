@@ -131,6 +131,11 @@ namespace War3Trainer
                     UnitListAddress  = _moduleAddress + 0xAB65F4;
                     MoveSpeedAddress = _moduleAddress + 0x201CD0;
                     break;
+                case "1.27.0.52240":
+                    ThisGameAddress  = _moduleAddress + 0xBE40A8;
+                    UnitListAddress  = _moduleAddress + 0xBE4238;
+                    MoveSpeedAddress = _moduleAddress + 0x5DF420;
+                    break;
                 default:
                     throw new UnkonwnGameVersionExpection(
                         this.ProcessId,
@@ -159,13 +164,14 @@ namespace War3Trainer
                 case "1.24.4.6387":
                 case "1.25.1.6397":
                 case "1.26.0.6401":
+                case "1.27.0.52240":
                     AttackAttributesOffset = 0x1E8;
                     HeroAttributesOffset   = 0x1F0;
                     ItemsListOffset        = 0x1F8;
                     MoveSpeedOffset        = 0x1DC;
                     break;
                 default:
-                    System.Diagnostics.Debug.Assert(false, "Immposible to run here");
+                    System.Diagnostics.Debug.Assert(false, "Impossible to run to here");
                     break;
             }
         }
