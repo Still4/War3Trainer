@@ -1,11 +1,11 @@
 # War3Trainer(WarCraft III Trainer)
 
-ÕâÊÇÎÒ[blog](http://tctianchi.duapp.com/)ÎÄÕÂÖÐ¹ØÓÚÄ§ÊÞ3ÄÚ´æÐÞ¸ÄÆ÷¶ÔÓ¦µÄ´úÂë¡£±àÒëºÃµÄ¶þ½øÖÆÒ²Çëµ½ÄÇÀïÏÂÔØ¡£ÓÉÓÚÊÇÊ®¶àÄêÇ°µÄ¾ÉÎïËùÒÔÎÒÒ²Ö»ÊÇ¹ÃÇÒ°áÔËµ½github¶øÒÑ£¬²»Ò»¶¨¸üÐÂÁË¡£
+è¿™æ˜¯æˆ‘[blog](http://tctianchi.duapp.com/)æ–‡ç« ä¸­å…³äºŽé­”å…½3å†…å­˜ä¿®æ”¹å™¨å¯¹åº”çš„ä»£ç ã€‚ç¼–è¯‘å¥½çš„äºŒè¿›åˆ¶ä¹Ÿè¯·åˆ°é‚£é‡Œä¸‹è½½ã€‚ç”±äºŽæ˜¯åå¤šå¹´å‰çš„æ—§ç‰©æ‰€ä»¥æˆ‘ä¹Ÿåªæ˜¯å§‘ä¸”æ¬è¿åˆ°githubè€Œå·²ï¼Œä¸ä¸€å®šæ›´æ–°äº†ã€‚
 
-## ÐÞ¸ÄÆ÷¼ò½é
-ÐÞ¸ÄÆ÷²»ÊÇ×÷±×Æ÷£¬Ö»ÄÜÔÚµ¥»úÉÏÊ¹ÓÃ£»Õ½ÍøÉÏÎÞ·¨ºúÄÖ£»ÔÚËÞÉáÀïÁª»ú´òRPGµØÍ¼µÄÍ¯Ð¬ÐèÒªÔÚÃ¿Ì¨µçÄÔÉÏ×öÏàÍ¬µÄÐÞ¸Ä¶¯×÷£¬²Å²»»áµôÏß¡£
+## ä¿®æ”¹å™¨ç®€ä»‹
+ä¿®æ”¹å™¨ä¸æ˜¯ä½œå¼Šå™¨ï¼Œåªèƒ½åœ¨å•æœºä¸Šä½¿ç”¨ï¼›æˆ˜ç½‘ä¸Šæ— æ³•èƒ¡é—¹ï¼›åœ¨å®¿èˆé‡Œè”æœºæ‰“RPGåœ°å›¾çš„ç«¥éž‹éœ€è¦åœ¨æ¯å°ç”µè„‘ä¸Šåšç›¸åŒçš„ä¿®æ”¹åŠ¨ä½œï¼Œæ‰ä¸ä¼šæŽ‰çº¿ã€‚
 
-## Ö§³ÖµÄÓÎÏ·°æ±¾
+## æ”¯æŒçš„æ¸¸æˆç‰ˆæœ¬
 * 1.20.4.6074
 * 1.21.0.6263
 * 1.21.1.6300
@@ -20,26 +20,25 @@
 * 1.26.0.6401
 * 1.27.0.52240
 
-## ÐÂ°æ±¾³öÏÖºóµÄ¸üÐÂ·½·¨£¨³ÌÐòÔ±¿´ÕâÀï£©
+## æ–°ç‰ˆæœ¬å‡ºçŽ°åŽçš„æ›´æ–°æ–¹æ³•ï¼ˆç¨‹åºå‘˜çœ‹è¿™é‡Œï¼‰
 1. War3AddressThisGame
-  1. ÕÒµ½Á¦Á¿
-  2. ÕÒµ½DrawHeroProperty
-    int __thiscall DrawHeroProperty(int *GameContext, int **HeroAttributes, int *AttributeBias, unsigned int *GBuffer)
-  3. ¸ú×ÙÖÇÁ¦µÄÏÔÊ¾¹ý³Ì
-    ±æ±ð·½·¨£º
-    1. +148¸ÄÎª+94£¬ÕâÊÇÁ¦Á¿
-    2. +168¸ÄÎª+A8£¬ÕâÊÇÃô½Ý
-    3. Í¬Àí£¬Storm_578(... "%d"Ö®Ç°£¬±ØÈ»»¹ÓÐÒ»´Îº¯Êýµ÷ÓÃ£¬ÕâÊÇÖÇÁ¦
-  4. ÉÔÎ¢¸ú½ø1¡¢2¸öº¯Êý¾ÍÄÜ¿´µ½dword_xxxÁË
+    1. æ‰¾åˆ°åŠ›é‡
+    2. æ‰¾åˆ°DrawHeroProperty
+        ```
+        int __thiscall DrawHeroProperty(int *GameContext, int **HeroAttributes, int *AttributeBias, unsigned int *GBuffer)
+        ```
+    3. è·Ÿè¸ªæ™ºåŠ›çš„æ˜¾ç¤ºè¿‡ç¨‹ã€‚è¾¨åˆ«æ–¹æ³•ï¼š
+        1. +148æ”¹ä¸º+94ï¼Œè¿™æ˜¯åŠ›é‡
+        2. +168æ”¹ä¸º+A8ï¼Œè¿™æ˜¯æ•æ·
+        3. åŒç†ï¼ŒStorm_578(... "%d"ä¹‹å‰ï¼Œå¿…ç„¶è¿˜æœ‰ä¸€æ¬¡å‡½æ•°è°ƒç”¨ï¼Œè¿™æ˜¯æ™ºåŠ›
+    4. ç¨å¾®è·Ÿè¿›1ã€2ä¸ªå‡½æ•°å°±èƒ½çœ‹åˆ°dword_xxxäº†
 2. War3AddressSelectedUnitList
-ÒýÓÃ"LOCAL_PLAYER"×îºó¼¸¸ö¸öº¯ÊýµÄÏÂ·½£¬ÓÃCÓïÑÔ¿´£¬
-ËÑË÷Ê±²»±Ø´ÓÍ·¿ªÊ¼£¬´Ó×Ö·û´®¶Î1/2´¦¿ªÊ¼¼´¿É
-
-¸Ãº¯ÊýÍ·²¿Í¬Ê±ÓÐ"LOCAL_PLAYER"¡¢"LOCAL_GAME"£¬Ä©Î²ÐÎÈç
-```
- if ( !dword_6FAA2FFC )
-    dword_6FAA2FFC = sub_6F0074F0();
-```
+ Â  Â å¼•ç”¨"LOCAL_PLAYER"æœ€åŽå‡ ä¸ªä¸ªå‡½æ•°çš„ä¸‹æ–¹ï¼Œç”¨Cè¯­è¨€çœ‹ï¼Œæœç´¢æ—¶ä¸å¿…ä»Žå¤´å¼€å§‹ï¼Œä»Žå­—ç¬¦ä¸²æ®µ1/2å¤„å¼€å§‹å³å¯ã€‚
+ Â 
+    è¯¥å‡½æ•°å¤´éƒ¨åŒæ—¶æœ‰"LOCAL_PLAYER"ã€"LOCAL_GAME"ï¼Œæœ«å°¾å½¢å¦‚
+    ```
+       if ( !dword_6FAA2FFC )
+          dword_6FAA2FFC = sub_6F0074F0();
+    ```
 3. War3AddressMoveSpeed
-´øÈëÐÞ¸ÄÆ÷´úÂë¼´¿É
-¶àÊýÇé¿öÏÂ£¬Ã¿´Îµü´ú¶¼ÊÇÍ¬Ò»¸öÊý×Ö£¬Ö»ÓÐÒ»´Î»áÓÐËù²»Í¬
+    å¸¦å…¥ä¿®æ”¹å™¨ä»£ç å³å¯ã€‚å¤šæ•°æƒ…å†µä¸‹ï¼Œæ¯æ¬¡è¿­ä»£éƒ½æ˜¯åŒä¸€ä¸ªæ•°å­—ï¼Œåªæœ‰ä¸€æ¬¡ä¼šæœ‰æ‰€ä¸åŒ
