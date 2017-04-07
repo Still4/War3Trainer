@@ -2,6 +2,8 @@
 
 这是我[blog](http://tctianchi.duapp.com/)文章中关于魔兽3内存修改器对应的代码。编译好的二进制也请到那里下载。由于是十多年前的旧物所以我也只是姑且搬运到github而已，不一定更新了。
 
+![Screenshot](https://raw.githubusercontent.com/tctianchi/Civ6Trainer/Screenshot.png)
+
 ## 修改器简介
 修改器不是作弊器，只能在单机上使用；战网上无法胡闹；在宿舍里联机打RPG地图的童鞋需要在每台电脑上做相同的修改动作，才不会掉线。
 
