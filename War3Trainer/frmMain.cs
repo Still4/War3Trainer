@@ -39,6 +39,11 @@ namespace War3Trainer
             try
             {
                 _currentGameContext = GameContext.FindGameRunning("war3", "game.dll");
+                if (_currentGameContext == null)
+                {
+                    // netease war3 platform(dz.163.com)
+                    _currentGameContext = GameContext.FindGameRunning("dzwar3", "game.dll");
+                }
                 if (_currentGameContext != null)
                 {
                     // Game online
