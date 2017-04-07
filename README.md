@@ -33,12 +33,13 @@
         3. 同理，Storm_578(... "%d"之前，必然还有一次函数调用，这是智力
     4. 稍微跟进1、2个函数就能看到dword_xxx了
 2. War3AddressSelectedUnitList
-    引用"LOCAL_PLAYER"最后几个个函数的下方，用C语言看，搜索时不必从头开始，从字符串段1/2处开始即可。
-  
-    该函数头部同时有"LOCAL_PLAYER"、"LOCAL_GAME"，末尾形如
-    ```
+    1. 引用"LOCAL_PLAYER"最后几个个函数的下方，用C语言看
+    1. 搜索时不必从头开始，从字符串段1/2处开始即可
+    1. 该函数头部同时有"LOCAL_PLAYER"、"LOCAL_GAME"，末尾形如
+        ```
        if ( !dword_6FAA2FFC )
           dword_6FAA2FFC = sub_6F0074F0();
-    ```
+        ```
 3. War3AddressMoveSpeed
-    带入修改器代码即可。多数情况下，每次迭代都是同一个数字，只有一次会有所不同
+    1. 带入修改器代码即可
+    1. 多数情况下，每次迭代都是同一个数字，只有一次会有所不同
