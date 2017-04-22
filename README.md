@@ -1,6 +1,6 @@
 # War3Trainer(WarCraft III Trainer)
 
-这是我[blog](http://tctianchi.duapp.com/)文章中关于魔兽3内存修改器对应的代码。编译好的二进制也请到那里下载。由于是十多年前的旧物所以我也只是姑且搬运到github而已，不一定更新了。
+这是我[blog](http://tctianchi.duapp.com/)文章中关于[魔兽3内存修改器](http://tctianchi.duapp.com/archives/tag/%E9%AD%94%E5%85%BD3)对应的代码。编译好的二进制也请到那里下载。由于是十多年前的旧物所以我也只是姑且搬运到github而已，不一定更新了。
 
 ![Screenshot](https://raw.githubusercontent.com/tctianchi/War3Trainer/master/Screenshot.png)
 
@@ -21,6 +21,7 @@
 * 1.25b（1.25.1.6397）
 * 1.26（1.26.0.6401）
 * 1.27a（1.27.0.52240）
+* 1.28（1.28.0.7205）
 
 ## 新版本出现后的更新方法（程序员看这里）
 如果有下一个版本的魔兽3，我肯定不会马上更新修改器的，你可以用下面的方法更改修改器的代码，达到升级的目的。

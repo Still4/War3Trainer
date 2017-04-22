@@ -290,9 +290,7 @@ namespace War3Trainer
 
         private void ReportVersionFailure(int processId, string version)
         {
-            labGameScanState.Text = "检测到游戏（"
-                + processId.ToString()
-                + "），但版本（"
+            labGameScanState.Text = "检测到游戏，但版本（"
                 + version
                 + "）不被支持";
         }
@@ -311,10 +309,12 @@ namespace War3Trainer
         /************************************************************************/
         private void MenuHelpAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("要求还挺高……" + System.Environment.NewLine + System.Environment.NewLine
-                + "其实说明都写在软件第1页了，" + System.Environment.NewLine
-                + "没啥好解释的。有更多问题来信" + System.Environment.NewLine
-                + "吧：tctianchi@163.com",
+            MessageBox.Show("魔兽争霸3 冰封王座 内存修改器" + System.Environment.NewLine
+                + Application.ProductVersion + System.Environment.NewLine
+                + System.Environment.NewLine
+                + "源代码在这里：https://github.com/tctianchi/War3Trainer" + System.Environment.NewLine
+                + "学着自己动手改。" + System.Environment.NewLine
+                + "",
                 "War3Trainer",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);

@@ -143,19 +143,19 @@
             // menuDebug1
             // 
             this.menuDebug1.Name = "menuDebug1";
-            this.menuDebug1.Size = new System.Drawing.Size(248, 22);
-            this.menuDebug1.Text = "内部-ReadFromGameMemory";
+            this.menuDebug1.Size = new System.Drawing.Size(272, 22);
+            this.menuDebug1.Text = "调试专用-ReadFromGameMemory";
             this.menuDebug1.Click += new System.EventHandler(this.menuDebug1_Click);
             // 
             // menuSplit1
             // 
             this.menuSplit1.Name = "menuSplit1";
-            this.menuSplit1.Size = new System.Drawing.Size(245, 6);
+            this.menuSplit1.Size = new System.Drawing.Size(269, 6);
             // 
             // menuFileExit
             // 
             this.menuFileExit.Name = "menuFileExit";
-            this.menuFileExit.Size = new System.Drawing.Size(248, 22);
+            this.menuFileExit.Size = new System.Drawing.Size(272, 22);
             this.menuFileExit.Text = "退出(&X)";
             this.menuFileExit.Click += new System.EventHandler(this.MenuFileExit_Click);
             // 
@@ -312,7 +312,7 @@
             this.Controls.Add(this.cmdGetAllObjects);
             this.Controls.Add(this.toolContainer);
             this.Name = "FrmMain";
-            this.Text = "魔兽3内存修改器 v13";
+            this.Text = "魔兽3内存修改器";
             this.Load += new System.EventHandler(this.FrmMain_Load);
             this.toolContainer.ContentPanel.ResumeLayout(false);
             this.toolContainer.ContentPanel.PerformLayout();
