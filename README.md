@@ -34,14 +34,14 @@
         ```
         __thiscall DrawHeroAttributes(int *GameContext, int **HeroAttributes, int *AttributeBias, unsigned int *GBuffer)
         ```
-    3. 这个函数很有特点，一些颜色字符串的中间穿插了读取命令，其中一定有：
+    3. 这个函数很有特点，一些颜色字符串（例如" |CFF00FF00+"）的中间穿插了读取命令，其中一定有：
         1. [xxx + 94h]，这是力量
         2. [xxx + A8h]，这是敏捷
         3. 同理，Storm_578(… “%d” …)之前，必然还有一次函数调用，这是智力
     4. 这个函数稍微跟进1、2个函数就能看到常量值dword_xxx，这个xxx就是ThisGameAddress
 2. UnitListAddress
-    1. 查找字符串”LOCAL_PLAYER”。搜索时不必从头开始，从字符串段1/2处开始即可
-    2. 引用该字符串的函数有很多，从最后一个开始看，没有的话看倒数第2个函数
+    1. 查找字符串“LOCAL_PLAYER”
+    2. 引用该字符串的函数有很多，逐个看
     3. 一定会有一个函数，头部同时有”LOCAL_PLAYER”、”LOCAL_GAME”，末尾形如
         ```
        if ( !dword_6FAA2FFC )

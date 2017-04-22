@@ -137,9 +137,9 @@ namespace War3Trainer
                     MoveSpeedAddress = _moduleAddress + 0x5DF420;
                     break;
                 case "1.28.0.7205":
-                    ThisGameAddress = _moduleAddress + 0xBE40A8;
-                    UnitListAddress = _moduleAddress + 0xBE4238;
-                    MoveSpeedAddress = _moduleAddress + 0x5DF420;
+                    ThisGameAddress = _moduleAddress + 0xD72F58;
+                    UnitListAddress = _moduleAddress + 0xD730F0;
+                    MoveSpeedAddress = _moduleAddress + 0x604470;
                     break;
                 default:
                     throw new UnkonwnGameVersionExpection(
