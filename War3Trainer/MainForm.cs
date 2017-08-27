@@ -4,12 +4,12 @@ using System.Windows.Forms;
 
 namespace War3Trainer
 {
-    public partial class FrmMain : Form
+    public partial class MainForm : Form
     {
         private GameContext _currentGameContext;
         private GameTrainer _mainTrainer;
 
-        public FrmMain()
+        public MainForm()
         {
             InitializeComponent();
             SetRightGrid(RightFunction.Introduction);
