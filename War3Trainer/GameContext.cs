@@ -141,6 +141,11 @@ namespace War3Trainer
                     UnitListAddress = _moduleAddress + 0xD730F0;
                     MoveSpeedAddress = _moduleAddress + 0x604470;
                     break;
+                case "1.28.5.7680":
+                    ThisGameAddress = _moduleAddress + 0xD30448;
+                    UnitListAddress = _moduleAddress + 0xD305E0;
+                    MoveSpeedAddress = _moduleAddress + 0x630C70;
+                    break;
                 default:
                     throw new UnkonwnGameVersionExpection(
                         this.ProcessId,
@@ -171,6 +176,7 @@ namespace War3Trainer
                 case "1.26.0.6401":
                 case "1.27.0.52240":
                 case "1.28.0.7205":
+                case "1.28.5.7680":
                     AttackAttributesOffset = 0x1E8;
                     HeroAttributesOffset   = 0x1F0;
                     ItemsListOffset        = 0x1F8;
